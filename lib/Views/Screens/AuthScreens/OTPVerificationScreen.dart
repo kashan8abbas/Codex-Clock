@@ -1,3 +1,4 @@
+import 'package:codex_clock/Views/Screens/HomePages/HomeScreen.dart';
 import 'package:codex_clock/Views/Widgets/CustomButton.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -100,7 +101,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             CustomButton(
               text: "Confirm",
               color: const Color.fromRGBO(236, 0, 60, 1),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
+              },
             ),
 
             const SizedBox(height: 20),

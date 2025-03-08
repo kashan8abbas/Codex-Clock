@@ -10,6 +10,75 @@ class SignUpViewModel extends ChangeNotifier {
   final TextEditingController currentAddressController =
       TextEditingController();
 
+  // Form validation errors
+  String? categoryError;
+  String? dayError;
+  String? monthError;
+  String? yearError;
+  String? genderError;
+  String? permanentError;
+  String? currentError;
+
+  bool validateForm() {
+    bool isValid = true;
+
+    // Category validation
+    if (selectedCategory == null || selectedCategory!.isEmpty) {
+      categoryError = "Category is required";
+      isValid = false;
+    } else {
+      categoryError = null;
+    }
+
+    // Date of Birth validation
+    if (selectedDay == null) {
+      dayError = "Day is required";
+      isValid = false;
+    } else {
+      dayError = null;
+    }
+
+    if (selectedMonth == null) {
+      monthError = "Month is required";
+      isValid = false;
+    } else {
+      monthError = null;
+    }
+
+    if (selectedYear == null) {
+      yearError = "Year is required";
+      isValid = false;
+    } else {
+      yearError = null;
+    }
+
+    // Gender validation
+    if (selectedGender.isEmpty) {
+      genderError = "Gender is required";
+      isValid = false;
+    } else {
+      genderError = null;
+    }
+
+    // Address validation
+    if (permanentAddressController.text.isEmpty) {
+      permanentError = "Permanent address is required";
+      isValid = false;
+    } else {
+      permanentError = null;
+    }
+
+    if (currentAddressController.text.isEmpty) {
+      currentError = "Current address is required";
+      isValid = false;
+    } else {
+      currentError = null;
+    }
+
+    notifyListeners();
+    return isValid;
+  }
+
   void setCategory(String? value) {
     selectedCategory = value;
     notifyListeners();

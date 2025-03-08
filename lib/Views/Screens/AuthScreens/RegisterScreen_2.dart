@@ -135,7 +135,16 @@ class Registration2Screen extends StatelessWidget {
               CustomButton(
                 color: Color.fromRGBO(236, 0, 60, 1),
                 text: "Sign Up",
-                onPressed: viewModel.signUp,
+                onPressed: () {
+                  if (viewModel.validateForm()) {
+                    // Proceed to next screen
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Form is valid, proceeding..."),
+                      ),
+                    );
+                  }
+                },
               ),
             ],
           ),
