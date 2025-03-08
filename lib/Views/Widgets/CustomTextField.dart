@@ -25,7 +25,7 @@ class CustomTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          height: screenHeight / 16,
+          height: screenHeight / 17,
           decoration: BoxDecoration(
             color: const Color.fromRGBO(
               236,

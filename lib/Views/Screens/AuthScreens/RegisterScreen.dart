@@ -41,8 +41,8 @@ class RegistrationScreen extends StatelessWidget {
                             );
                           },
                           child: Container(
-                            width: 120,
-                            height: 120,
+                            width: 130,
+                            height: 130,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
@@ -59,8 +59,8 @@ class RegistrationScreen extends StatelessWidget {
                           ),
                         ),
                         Positioned(
-                          bottom: 5,
-                          right: 5,
+                          bottom: 10,
+                          right: 25,
                           child: CircleAvatar(
                             backgroundColor: Colors.black,
                             radius: 14,

@@ -1,6 +1,7 @@
 import 'package:codex_clock/ViewModels/Login_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/OTPVerificationScreen.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/RegisterScreen.dart';
+import 'package:codex_clock/Views/Screens/AuthScreens/RegisterScreen_2.dart';
 import 'package:codex_clock/Views/Widgets/CustomButton.dart';
 import 'package:codex_clock/Views/Widgets/CustomTextField.dart';
 import 'package:flutter/material.dart';
@@ -76,7 +77,7 @@ class LoginScreen extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => RegistrationScreen(),
+                                    builder: (context) => Registration2Screen(),
                                   ),
                                 );
                               },
