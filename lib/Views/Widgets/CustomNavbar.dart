@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -22,7 +23,7 @@ class CustomBottomNavBar extends StatelessWidget {
             topRight: Radius.circular(10),
           ),
           child: BottomAppBar(
-            color: const Color.fromARGB(255, 168, 77, 77),
+            color: const Color.fromARGB(255, 255, 255, 255),
             shape: const CircularNotchedRectangle(),
             notchMargin: 10, // Prevent clipping
             child: SizedBox(
@@ -33,10 +34,54 @@ class CustomBottomNavBar extends StatelessWidget {
                   // Home Button
                   IconButton(
                     onPressed: () => onItemTapped(0),
-                    icon: Icon(
-                      Icons.home,
-                      color: selectedIndex == 0 ? Colors.red : Colors.grey,
-                    ),
+                    icon:
+                        selectedIndex != 0
+                            ? Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Outer red home border
+                                SvgPicture.asset(
+                                  "lib/Utils/Icons/home.svg",
+                                  colorFilter: const ColorFilter.mode(
+                                    Colors.red,
+                                    BlendMode.srcIn,
+                                  ), // Red Border
+                                  width: 27,
+                                  height: 27,
+                                ),
+                                // Inner white home icon
+                                SvgPicture.asset(
+                                  "lib/Utils/Icons/home.svg",
+                                  colorFilter: const ColorFilter.mode(
+                                    Colors.white,
+                                    BlendMode.srcIn,
+                                  ), // White Fill
+                                  width: 20,
+                                  height: 20,
+                                ),
+                                // Red Door inside home
+                                Positioned(
+                                  bottom: 3, // Adjust based on icon structure
+                                  child: Container(
+                                    width: 6,
+                                    height: 7,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(
+                                        2,
+                                      ), // Optional rounded door effect
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                            : SvgPicture.asset(
+                              "lib/Utils/Icons/home.svg",
+                              colorFilter: const ColorFilter.mode(
+                                Colors.red, // Fully red when selected
+                                BlendMode.srcIn,
+                              ),
+                            ),
                   ),
 
                   // Empty space for floating button
@@ -46,8 +91,12 @@ class CustomBottomNavBar extends StatelessWidget {
                   IconButton(
                     onPressed: () => onItemTapped(2),
                     icon: Icon(
-                      Icons.menu,
-                      color: selectedIndex == 2 ? Colors.red : Colors.grey,
+                      size: 30,
+                      Icons.menu_open_outlined,
+                      color:
+                          selectedIndex == 2
+                              ? Colors.red
+                              : const Color.fromARGB(255, 98, 43, 43),
                     ),
                   ),
                 ],
@@ -64,10 +113,15 @@ class CustomBottomNavBar extends StatelessWidget {
             backgroundColor: Colors.red,
             elevation: 6, // Added shadow for visibility
             shape: const CircleBorder(),
-            child: const Icon(
-              Icons.qr_code_scanner,
-              color: Colors.white,
-              size: 32,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 2.0),
+              child: SvgPicture.asset(
+                "lib/Utils/Icons/scan.svg",
+                colorFilter: const ColorFilter.mode(
+                  Color.fromARGB(255, 255, 255, 255), // Fully red when selected
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
           ),
         ),

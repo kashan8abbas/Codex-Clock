@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:codex_clock/Views/Widgets/CustomNavbar.dart';
+import 'package:codex_clock/Views/Widgets/CustomTimeCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,12 +15,36 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String currentTime = '';
   int _selectedIndex = 0;
+  int _selectedTabIndex = 0;
+  final List<String> _tabs = ["Weekly", "Monthly", "Yearly"];
+
+  // Different data for each tab
+  final Map<int, List<double>> _chartData = {
+    0: [150, 180, 230, 100, 150, 100, 120], // Weekly
+    1: [200, 220, 250, 190, 210, 180, 160], // Monthly
+    2: [300, 280, 310, 270, 290, 260, 250], // Yearly
+  };
+
+  void updateTime() {
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        currentTime = DateFormat('hh:mm:ss a').format(DateTime.now());
+      });
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    updateTime();
   }
 
   @override
@@ -25,68 +54,81 @@ class _HomeScreenState extends State<HomeScreen> {
 
       body:
           _selectedIndex == 0
-              ? SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        height: 100,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 25.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Profile (Profile Button)
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.pushNamed(context, '/profile');
-                                },
-                                icon: SizedBox(
-                                  width: 60,
-                                  height: 60,
-                                  child: ClipOval(
-                                    child: SvgPicture.asset(
-                                      "lib/Utils/Images/Logo.svg",
-                                      width: 36,
-                                      height: 36,
-                                    ),
+              ? Stack(
+                children: [
+                  // Scrollable content
+                  SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 100),
+                          TimeCardWidget(),
+                          const SizedBox(height: 15),
+                          _buildLeaveBalance(),
+                          const SizedBox(height: 20),
+                          _buildChartSection(),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Fixed Top Bar
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      width: double.infinity,
+                      height: 100,
+                      color: Color.fromRGBO(
+                        246,
+                        245,
+                        248,
+                        1,
+                      ), // Add background color to prevent transparency issues
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 25.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/profile');
+                              },
+                              icon: SizedBox(
+                                width: 60,
+                                height: 60,
+                                child: ClipOval(
+                                  child: SvgPicture.asset(
+                                    "lib/Utils/Images/Logo.svg",
+                                    width: 36,
+                                    height: 36,
                                   ),
                                 ),
                               ),
+                            ),
 
-                              // Spacer to center the text
-                              const Spacer(),
+                            const Spacer(),
 
-                              // Title
-                              const Text(
-                                "M Waleed",
-                                style: TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 0, 0, 0),
-                                ),
+                            const Text(
+                              "M Waleed",
+                              style: TextStyle(
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(255, 0, 0, 0),
                               ),
+                            ),
 
-                              // Spacer for balance
-                              const Spacer(),
+                            const Spacer(),
 
-                              // Invisible button (to keep balance in spacing)
-                              const SizedBox(width: 60),
-                            ],
-                          ),
+                            const SizedBox(width: 60), // Keeps spacing balanced
+                          ],
                         ),
                       ),
-
-                      _buildTimeCard(),
-                      const SizedBox(height: 15),
-                      _buildLeaveBalance(),
-                      const SizedBox(height: 20),
-                      //_buildChartSection(),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               )
               : _selectedIndex == 1
               ? Text("Scan")
@@ -104,6 +146,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Card(
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 8, // Adds a default shadow effect
+      shadowColor: Colors.black.withOpacity(0.7), // Customize shadow color
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -135,6 +179,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Card(
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 8, // Adds a default shadow effect
+      shadowColor: Colors.black.withOpacity(0.7), // Customize shadow color
       child: Padding(
         padding: const EdgeInsets.all(0.0),
         child: Column(
@@ -156,13 +202,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(color: Colors.grey),
               ),
             ),
-            const SizedBox(height: 0),
+
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               childAspectRatio:
-                  2, // Adjust this value to control width & height ratio
+                  1.95, // Adjust this value to control width & height ratio
               children: const [
                 LeaveCard(title: "Sick Leave", value: "06", icon: Icons.group),
                 LeaveCard(title: "Absent", value: "02", icon: Icons.group),
@@ -179,26 +225,172 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildChartSection() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      color: Colors.white,
+      elevation: 8,
+      shadowColor: Colors.black.withOpacity(0.7),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _ChartTab(text: "Weekly", isSelected: true),
-                _ChartTab(text: "Monthly"),
-                _ChartTab(text: "Yearly"),
-              ],
+            // Styled Radio Buttons as Tabs
+            Container(
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(
+                  246,
+                  245,
+                  248,
+                  1,
+                ), // Background color
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  children: List.generate(
+                    _tabs.length,
+                    (index) => Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedTabIndex = index;
+                          });
+                        },
+                        child: Container(
+                          height: 35,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 2,
+                              color:
+                                  _selectedTabIndex == index
+                                      ? Colors
+                                          .red // Selected tab background
+                                      : Colors.transparent,
+                            ),
+                            color:
+                                _selectedTabIndex == index
+                                    ? Colors
+                                        .white // Selected tab background
+                                    : Colors
+                                        .transparent, // Unselected tab background
+                            borderRadius: BorderRadius.circular(
+                              10,
+                            ), // Smooth edges
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            _tabs[index],
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  _selectedTabIndex == index
+                                      ? Colors
+                                          .black // Dark text for selected
+                                      : Colors.black.withOpacity(
+                                        0.5,
+                                      ), // Faded text for unselected
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 10),
+
+            const SizedBox(height: 30),
+
+            // Bar Chart
             SizedBox(
-              height: 100,
-              child: Placeholder(), // Replace with actual chart
+              height: 200,
+              child: BarChart(
+                BarChartData(
+                  gridData: FlGridData(
+                    show: true,
+                    drawHorizontalLine: true,
+                    drawVerticalLine: false,
+                    getDrawingHorizontalLine:
+                        (value) => FlLine(color: Colors.grey, strokeWidth: 1.2),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 30,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            value.toInt().toString(),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          List<String> days = [
+                            "Mon",
+                            "Tue",
+                            "Wed",
+                            "Thu",
+                            "Fri",
+                            "Sat",
+                            "Sun",
+                          ];
+                          return value.toInt() >= 0 &&
+                                  value.toInt() < days.length
+                              ? Text(
+                                days[value.toInt()],
+                                style: const TextStyle(fontSize: 12),
+                              )
+                              : Container();
+                        },
+                      ),
+                    ),
+                  ),
+                  barGroups: List.generate(
+                    7,
+                    (index) => _buildBarGroup(
+                      index,
+                      _chartData[_selectedTabIndex]![index],
+                      index % 2 == 0 ? Colors.red : Colors.pink.shade300,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  BarChartGroupData _buildBarGroup(int x, double y, Color color) {
+    return BarChartGroupData(
+      x: x,
+      barRods: [
+        BarChartRodData(
+          toY: y,
+          color: color,
+          width: 30,
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ],
     );
   }
 }
@@ -239,71 +431,70 @@ class LeaveCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () {},
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // Takes only the required height
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double width = constraints.maxWidth;
+        double height = constraints.maxHeight;
+
+        return TextButton(
+          onPressed: () {},
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: width * 0.05, // Adjust padding based on width
+                vertical: height * 0.1, // Adjust padding based on height
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        value,
+                        style: TextStyle(
+                          fontSize:
+                              width * 0.1, // Adjust text size based on width
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Icon(
+                        icon,
+                        color: Colors.black,
+                        size: width * 0.08,
+                      ), // Icon size based on width
+                    ],
                   ),
-                  Icon(icon, color: Colors.black),
+                  SizedBox(height: height * 0.02), // Adjust spacing dynamically
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize:
+                              width * 0.07, // Adjust text size based on width
+                          color: Colors.black,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right,
+                        color: Colors.black,
+                        size: width * 0.103, // Adjust icon size based on width
+                      ),
+                    ],
+                  ),
                 ],
               ),
-              const SizedBox(height: 4), // Adjust spacing
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  const Icon(
-                    Icons.chevron_right,
-                    color: Colors.black,
-                    size: 25,
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ChartTab extends StatelessWidget {
-  final String text;
-  final bool isSelected;
-
-  const _ChartTab({required this.text, this.isSelected = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: isSelected ? Colors.red : Colors.black,
-      ),
+        );
+      },
     );
   }
 }
