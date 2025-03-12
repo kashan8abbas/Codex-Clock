@@ -12,7 +12,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => CameraViewModel()),
         ChangeNotifierProvider(create: (_) => SignUpViewModel()),
-        //ChangeNotifierProvider(create: (_) => QRScannerViewModel()),
+        ChangeNotifierProvider(create: (_) => QRScannerViewModel()),
       ],
       child: const MyApp(),
     ),
