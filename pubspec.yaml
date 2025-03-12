@@ -41,6 +41,10 @@ dependencies:
   camera: ^0.11.1
   fl_chart: ^0.70.2
   intl: ^0.20.2
+  qr_code_scanner:
+    path: C:/Users/syedk/qr_code_scanner
+  url_launcher: ^6.3.1
+  #mobile_scanner: ^6.0.7
 
 dev_dependencies:
   flutter_test:

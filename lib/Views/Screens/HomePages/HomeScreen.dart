@@ -15,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String currentTime = '';
   int _selectedIndex = 0;
   int _selectedTabIndex = 0;
@@ -46,12 +47,41 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     updateTime();
   }
-
+  
   @override
   Widget build(BuildContext context) {
+    if (_selectedIndex == 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scaffoldKey.currentState?.openDrawer();
+      });
+    }
+    //double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
-
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text("Drawer Header", style: TextStyle(color: Colors.white, fontSize: 24)),
+            ),
+            ListTile(
+              title: const Text("Item 1"),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+              },
+            ),
+            ListTile(
+              title: const Text("Item 2"),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+              },
+            ),
+          ],
+        ),
+      ),
       body:
           _selectedIndex == 0
               ? Stack(
@@ -64,9 +94,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           SizedBox(height: 100),
                           TimeCardWidget(),
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 10),
                           _buildLeaveBalance(),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 10),
                           _buildChartSection(),
                         ],
                       ),
@@ -88,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         1,
                       ), // Add background color to prevent transparency issues
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 25.0),
+                        padding: const EdgeInsets.only(top: 30),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -180,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 8, // Adds a default shadow effect
-      shadowColor: Colors.black.withOpacity(0.7), // Customize shadow color
+      shadowColor: Colors.black.withOpacity(0.5), // Customize shadow color
       child: Padding(
         padding: const EdgeInsets.all(0.0),
         child: Column(
@@ -227,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       color: Colors.white,
       elevation: 8,
-      shadowColor: Colors.black.withOpacity(0.7),
+      shadowColor: Colors.black.withOpacity(0.5),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

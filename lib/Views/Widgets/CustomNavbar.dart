@@ -93,10 +93,7 @@ class CustomBottomNavBar extends StatelessWidget {
                     icon: Icon(
                       size: 30,
                       Icons.menu_open_outlined,
-                      color:
-                          selectedIndex == 2
-                              ? Colors.red
-                              : const Color.fromARGB(255, 98, 43, 43),
+                      color: selectedIndex == 2 ? Colors.red : Colors.grey,
                     ),
                   ),
                 ],

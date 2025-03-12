@@ -43,7 +43,7 @@ class _TimeCardWidgetState extends State<TimeCardWidget> {
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 8, // Adds a default shadow effect
-      shadowColor: Colors.black.withOpacity(0.7), // Customize shadow color
+      shadowColor: Colors.black.withOpacity(0.5), // Customize shadow color
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -60,9 +60,9 @@ class _TimeCardWidgetState extends State<TimeCardWidget> {
             const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _IconText(icon: Icons.access_time, text: "10:00 AM\nCheck In"),
-                _IconText(icon: Icons.logout, text: "06:00 PM\nCheck Out"),
-                _IconText(icon: Icons.timer, text: "08:00\nTotal Hrs"),
+                _IconText(icon: Icons.access_time, text: "10:00 AM"),
+                _IconText(icon: Icons.logout, text: "06:00 PM"),
+                _IconText(icon: Icons.timer, text: "08:00"),
               ],
             ),
           ],
@@ -83,12 +83,16 @@ class _IconText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, size: 30, color: Colors.black54),
+        Icon(icon, size: 30, color: Colors.black),
         const SizedBox(height: 5),
         Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 14, color: Colors.black),
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );
