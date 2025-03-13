@@ -18,7 +18,7 @@ class _QRScannerBodyState extends State<QRScannerBody> {
     return Column(
       children: [
         Expanded(
-          flex: 5,
+          flex: 12,
           child: QRView(key: qrKey, onQRViewCreated: _onQRViewCreated),
         ),
         Expanded(

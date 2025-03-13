@@ -150,39 +150,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTimeCard() {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      elevation: 8, // Adds a default shadow effect
-      shadowColor: Colors.black.withOpacity(0.7), // Customize shadow color
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const Text(
-              "10:00 AM",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const Text(
-              "Jan 27 - 2025 Monday",
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                _IconText(icon: Icons.access_time, text: "10:00 AM\nCheck In"),
-                _IconText(icon: Icons.logout, text: "06:00 PM\nCheck Out"),
-                _IconText(icon: Icons.timer, text: "08:00\nTotal Hrs"),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildLeaveBalance() {
     return Card(
       color: Colors.white,
@@ -403,6 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+// ignore: unused_element
 class _IconText extends StatelessWidget {
   final IconData icon;
   final String text;

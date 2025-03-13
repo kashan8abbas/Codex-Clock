@@ -63,15 +63,6 @@ class CustomDrawer extends StatelessWidget {
               const Spacer(),
 
               // Back icon at the left bottom
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                  onPressed: () {
-                    Navigator.pop(context); // Close the drawer
-                  },
-                ),
-              ),
             ],
           ),
         ),
