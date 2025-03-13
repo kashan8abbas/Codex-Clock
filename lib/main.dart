@@ -2,7 +2,7 @@ import 'package:codex_clock/ViewModels/QRCode_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Register2_VIewModel.dart';
 import 'package:codex_clock/ViewModels/TakePhoto_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/LoginScreen.dart';
-import 'package:codex_clock/Views/Screens/HomePages/QR_CodeScreen.dart';
+//import 'package:codex_clock/Views/Screens/HomePages/QR_CodeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +24,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: MyHomeScreen());
+    return MaterialApp(debugShowCheckedModeBanner: false, home: LoginScreen());
   }
 }

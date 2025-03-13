@@ -34,54 +34,13 @@ class CustomBottomNavBar extends StatelessWidget {
                   // Home Button
                   IconButton(
                     onPressed: () => onItemTapped(0),
-                    icon:
-                        selectedIndex != 0
-                            ? Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                // Outer red home border
-                                SvgPicture.asset(
-                                  "lib/Utils/Icons/home.svg",
-                                  colorFilter: const ColorFilter.mode(
-                                    Colors.red,
-                                    BlendMode.srcIn,
-                                  ), // Red Border
-                                  width: 27,
-                                  height: 27,
-                                ),
-                                // Inner white home icon
-                                SvgPicture.asset(
-                                  "lib/Utils/Icons/home.svg",
-                                  colorFilter: const ColorFilter.mode(
-                                    Colors.white,
-                                    BlendMode.srcIn,
-                                  ), // White Fill
-                                  width: 20,
-                                  height: 20,
-                                ),
-                                // Red Door inside home
-                                Positioned(
-                                  bottom: 3, // Adjust based on icon structure
-                                  child: Container(
-                                    width: 6,
-                                    height: 7,
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      borderRadius: BorderRadius.circular(
-                                        2,
-                                      ), // Optional rounded door effect
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                            : SvgPicture.asset(
-                              "lib/Utils/Icons/home.svg",
-                              colorFilter: const ColorFilter.mode(
-                                Colors.red, // Fully red when selected
-                                BlendMode.srcIn,
-                              ),
-                            ),
+                    icon: SvgPicture.asset(
+                      "lib/Utils/Icons/home.svg",
+                      colorFilter: const ColorFilter.mode(
+                        Colors.red, // Fully red when selected
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
 
                   // Empty space for floating button

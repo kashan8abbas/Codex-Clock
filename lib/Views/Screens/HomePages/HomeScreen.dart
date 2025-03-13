@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:codex_clock/Views/Screens/HomePages/QR_CodeScreen.dart';
+import 'package:codex_clock/Views/Widgets/CustomDrawer.dart';
 import 'package:codex_clock/Views/Widgets/CustomNavbar.dart';
 import 'package:codex_clock/Views/Widgets/CustomTimeCard.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +42,11 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
+
+    if (_selectedIndex == 2) {
+      // Use the scaffold key to open the drawer
+      _scaffoldKey.currentState?.openEndDrawer();
+    }
   }
 
   @override
@@ -47,43 +54,16 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     updateTime();
   }
-  
+
   @override
   Widget build(BuildContext context) {
-    if (_selectedIndex == 1) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scaffoldKey.currentState?.openDrawer();
-      });
-    }
     //double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
-              child: Text("Drawer Header", style: TextStyle(color: Colors.white, fontSize: 24)),
-            ),
-            ListTile(
-              title: const Text("Item 1"),
-              onTap: () {
-                Navigator.pop(context); // Close the drawer
-              },
-            ),
-            ListTile(
-              title: const Text("Item 2"),
-              onTap: () {
-                Navigator.pop(context); // Close the drawer
-              },
-            ),
-          ],
-        ),
-      ),
+      endDrawer: const CustomDrawer(),
       body:
-          _selectedIndex == 0
+          _selectedIndex == 0 || _selectedIndex == 2
               ? Stack(
                 children: [
                   // Scrollable content
@@ -161,9 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               )
               : _selectedIndex == 1
-              ? Text("Scan")
-              : _selectedIndex == 2
-              ? Text("Drawer")
+              ? QRScannerBody()
               : Text("hello world"),
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: _selectedIndex,

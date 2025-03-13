@@ -1,37 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-class MyHomeScreen extends StatefulWidget {
-  const MyHomeScreen({super.key});
+class QRScannerBody extends StatefulWidget {
+  const QRScannerBody({Key? key}) : super(key: key);
 
   @override
-  State<MyHomeScreen> createState() => _MyHomeScreenState();
+  State<QRScannerBody> createState() => _QRScannerBodyState();
 }
 
-class _MyHomeScreenState extends State<MyHomeScreen> {
+class _QRScannerBodyState extends State<QRScannerBody> {
   final GlobalKey qrKey = GlobalKey(debugLabel: "QR");
   Barcode? result;
   QRViewController? controller;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            flex: 5,
-            child: QRView(key: qrKey, onQRViewCreated: _onQRViewCreated),
+    return Column(
+      children: [
+        Expanded(
+          flex: 5,
+          child: QRView(key: qrKey, onQRViewCreated: _onQRViewCreated),
+        ),
+        Expanded(
+          flex: 1,
+          child: Center(
+            child:
+                (result != null)
+                    ? Text("Barcode Data: ${result!.code}")
+                    : const Text("Scan a Code"),
           ),
-          Expanded(
-            flex: 1,
-            child: Center(
-              child:
-                  (result != null)
-                      ? Text("barcode Data: ${result!.code}")
-                      : Text("Scan a Code"),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -42,5 +41,11 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
         result = scanData;
       });
     });
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
   }
 }
