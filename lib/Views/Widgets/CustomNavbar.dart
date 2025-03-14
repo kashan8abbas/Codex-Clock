@@ -52,7 +52,7 @@ class CustomBottomNavBar extends StatelessWidget {
                     icon: Icon(
                       size: 30,
                       Icons.menu_open_outlined,
-                      color: selectedIndex == 2 ? Colors.red : Colors.grey,
+                      color: Colors.red,
                     ),
                   ),
                 ],

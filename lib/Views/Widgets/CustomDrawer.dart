@@ -1,3 +1,4 @@
+import 'package:codex_clock/Views/Screens/AdditionalScreens/SummaryScreen.dart';
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -6,7 +7,7 @@ class CustomDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 50.0),
@@ -51,7 +52,16 @@ class CustomDrawer extends StatelessWidget {
               ),
 
               // Menu items with card-like appearance
-              TextButton(onPressed: () {}, child: _buildMenuItem("Summary")),
+              TextButton(
+                onPressed: () {
+                  // Navigate to a specific page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SummaryScreen()),
+                  );
+                },
+                child: _buildMenuItem("Summary"),
+              ),
               const SizedBox(height: 5),
               TextButton(
                 onPressed: () {},

@@ -30,12 +30,20 @@ class _HomeScreenState extends State<HomeScreen> {
     2: [300, 280, 310, 270, 290, 260, 250], // Yearly
   };
 
+  Timer? _timer;
+
   void updateTime() {
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
         currentTime = DateFormat('hh:mm:ss a').format(DateTime.now());
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Cancel the timer to prevent memory leaks
+    super.dispose();
   }
 
   void _onItemTapped(int index) {
