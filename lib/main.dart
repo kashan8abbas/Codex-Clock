@@ -1,6 +1,10 @@
+import 'package:codex_clock/ViewModels/Attendence_ViewModel.dart';
+import 'package:codex_clock/ViewModels/Leave_ViewModel.dart';
 import 'package:codex_clock/ViewModels/QRCode_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Register2_VIewModel.dart';
 import 'package:codex_clock/ViewModels/TakePhoto_ViewModel.dart';
+import 'package:codex_clock/Views/Screens/AdditionalScreens/AttendenceScreen.dart';
+import 'package:codex_clock/Views/Screens/AdditionalScreens/LeaveScreen.dart';
 import 'package:codex_clock/Views/Screens/AdditionalScreens/SummaryScreen.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/LoginScreen.dart';
 //import 'package:codex_clock/Views/Screens/HomePages/QR_CodeScreen.dart';
@@ -14,6 +18,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => CameraViewModel()),
         ChangeNotifierProvider(create: (_) => SignUpViewModel()),
         ChangeNotifierProvider(create: (_) => QRScannerViewModel()),
+        ChangeNotifierProvider(create: (_) => ApplyLeaveViewModel()),
+        ChangeNotifierProvider(create: (_) => AttendanceModel()),
       ],
       child: const MyApp(),
     ),

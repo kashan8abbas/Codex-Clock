@@ -76,6 +76,9 @@ flutter:
     - lib/Utils/Icons/home.svg
     - lib/Utils/Icons/menu.svg
     - lib/Utils/Icons/scan.svg
+    - lib/Utils/Icons/checkin.svg
+    - lib/Utils/Icons/checkout.svg
+    - lib/Utils/Icons/totalhours.svg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

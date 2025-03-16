@@ -114,6 +114,13 @@ class _CameraScreenState extends State<CameraScreen> {
                                   painter: CornerPainter(
                                     isTop: true,
                                     isLeft: true,
+                                    Stroke: 5,
+                                    color: const Color.fromRGBO(
+                                      246,
+                                      245,
+                                      248,
+                                      1,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -125,6 +132,13 @@ class _CameraScreenState extends State<CameraScreen> {
                                   painter: CornerPainter(
                                     isTop: true,
                                     isLeft: false,
+                                    Stroke: 5,
+                                    color: const Color.fromRGBO(
+                                      246,
+                                      245,
+                                      248,
+                                      1,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -136,6 +150,13 @@ class _CameraScreenState extends State<CameraScreen> {
                                   painter: CornerPainter(
                                     isTop: false,
                                     isLeft: true,
+                                    Stroke: 5,
+                                    color: const Color.fromRGBO(
+                                      246,
+                                      245,
+                                      248,
+                                      1,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -147,6 +168,13 @@ class _CameraScreenState extends State<CameraScreen> {
                                   painter: CornerPainter(
                                     isTop: false,
                                     isLeft: false,
+                                    Stroke: 5,
+                                    color: const Color.fromRGBO(
+                                      246,
+                                      245,
+                                      248,
+                                      1,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -224,11 +252,15 @@ class _CameraScreenState extends State<CameraScreen> {
 class CornerPainter extends CustomPainter {
   final bool isTop;
   final bool isLeft;
-  final double radius; // Radius for rounded corners
+  final double radius;
+  final Color color;
+  final int Stroke;
 
   CornerPainter({
     required this.isTop,
     required this.isLeft,
+    required this.color,
+    required this.Stroke,
     this.radius = 20.0,
   });
 
@@ -236,7 +268,7 @@ class CornerPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint =
         Paint()
-          ..color = const Color.fromRGBO(246, 245, 248, 1)
+          ..color = color
           ..strokeWidth = 5
           ..style = PaintingStyle.stroke;
 

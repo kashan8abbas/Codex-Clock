@@ -16,6 +16,12 @@ class SummaryViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  //This function will work on database, this is implemented just as dummy for testing purposes.
+  bool isPresent(DateTime day) {
+    // Dummy condition for now
+    return day.day % 2 == 0;
+  }
+
   void setFocusedDay(DateTime day) {
     focusedDay = day;
     notifyListeners();

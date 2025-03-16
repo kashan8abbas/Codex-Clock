@@ -46,7 +46,12 @@ class _QRScannerBodyState extends State<QRScannerBody> {
                     left: 0,
                     child: CustomPaint(
                       size: const Size(30, 30),
-                      painter: CornerPainter(isTop: true, isLeft: true),
+                      painter: CornerPainter(
+                        isTop: true,
+                        isLeft: true,
+                        Stroke: 5,
+                        color: Colors.red,
+                      ),
                     ),
                   ),
                   Positioned(
@@ -54,7 +59,12 @@ class _QRScannerBodyState extends State<QRScannerBody> {
                     right: 0,
                     child: CustomPaint(
                       size: const Size(30, 30),
-                      painter: CornerPainter(isTop: true, isLeft: false),
+                      painter: CornerPainter(
+                        isTop: true,
+                        isLeft: false,
+                        Stroke: 5,
+                        color: Colors.red,
+                      ),
                     ),
                   ),
                   Positioned(
@@ -62,7 +72,12 @@ class _QRScannerBodyState extends State<QRScannerBody> {
                     left: 0,
                     child: CustomPaint(
                       size: const Size(30, 30),
-                      painter: CornerPainter(isTop: false, isLeft: true),
+                      painter: CornerPainter(
+                        isTop: false,
+                        isLeft: true,
+                        Stroke: 10,
+                        color: Colors.red,
+                      ),
                     ),
                   ),
                   Positioned(
@@ -70,7 +85,12 @@ class _QRScannerBodyState extends State<QRScannerBody> {
                     right: 0,
                     child: CustomPaint(
                       size: const Size(30, 30),
-                      painter: CornerPainter(isTop: false, isLeft: false),
+                      painter: CornerPainter(
+                        isTop: false,
+                        isLeft: false,
+                        Stroke: 10,
+                        color: Colors.red,
+                      ),
                     ),
                   ),
                 ],

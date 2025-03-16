@@ -1,3 +1,4 @@
+import 'package:codex_clock/Views/Screens/AdditionalScreens/LeaveScreen.dart';
 import 'package:codex_clock/Views/Screens/AdditionalScreens/SummaryScreen.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +22,7 @@ class CustomDrawer extends StatelessWidget {
                   children: [
                     const CircleAvatar(
                       radius: 30,
-                      backgroundImage: AssetImage('assets/profile.jpg'),
+                      backgroundImage: AssetImage('lib/Utils/Images/Logo.svg'),
                     ),
                     const SizedBox(width: 16),
                     Column(
@@ -64,7 +65,12 @@ class CustomDrawer extends StatelessWidget {
               ),
               const SizedBox(height: 5),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ApplyLeaveScreen()),
+                  );
+                },
                 child: _buildMenuItem("Leave Requests"),
               ),
               const SizedBox(height: 5),
