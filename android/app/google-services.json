@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "13677456177",
+    "project_id": "code-x-clock",
+    "storage_bucket": "code-x-clock.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:13677456177:android:208b53b366974e9fa69e10",
+        "android_client_info": {
+          "package_name": "com.example.codex_clock"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCeaERrX_uiudnK0GvDITSVBgWUfJPhv0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

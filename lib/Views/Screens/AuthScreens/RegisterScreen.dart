@@ -6,6 +6,8 @@ import 'package:codex_clock/Views/Widgets/CustomButton.dart';
 import 'package:codex_clock/Views/Widgets/CustomLabel.dart';
 import 'package:codex_clock/Views/Widgets/CustomTextField.dart';
 
+import 'RegisterScreen_2.dart';
+
 class RegistrationScreen extends StatelessWidget {
   const RegistrationScreen({super.key});
 
@@ -84,6 +86,7 @@ class RegistrationScreen extends StatelessWidget {
                         child: CustomTextField(
                           hint: "First Name",
                           controller: viewModel.firstNameController,
+                          focusNode: viewModel.firstNameFocusNode,
                           errorText: viewModel.firstNameError,
                         ),
                       ),
@@ -92,6 +95,7 @@ class RegistrationScreen extends StatelessWidget {
                         child: CustomTextField(
                           hint: "Last Name",
                           controller: viewModel.lastNameController,
+                          focusNode: viewModel.lastNameFocusNode,
                           errorText: viewModel.lastNameError,
                         ),
                       ),
@@ -101,25 +105,30 @@ class RegistrationScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   const CustomLabel(text: "Enter C.N.I.C No"),
                   CustomTextField(
-                    hint: "C.N.I.C No",
+                    hint: "XXXXX-XXXXXXX-X",
                     controller: viewModel.cnicController,
+                    focusNode: viewModel.cnicFocusNode,
+                    isCnic: true,
                     errorText: viewModel.cnicError,
                   ),
 
                   const SizedBox(height: 16),
                   const CustomLabel(text: "Enter Your Email"),
                   CustomTextField(
-                    hint: "Email",
+                    hint: "xyz@example.xxx",
                     controller: viewModel.emailController,
+                    focusNode: viewModel.emailFocusNode,
                     errorText: viewModel.emailError,
                   ),
 
                   const SizedBox(height: 16),
                   const CustomLabel(text: "Enter Your Mobile No"),
                   CustomTextField(
-                    hint: "Mobile No",
+                    hint: "3XXXXXXXXX",
                     controller: viewModel.mobileController,
+                    focusNode: viewModel.mobileFocusNode,
                     errorText: viewModel.mobileError,
+                    isPhoneField: true,
                   ),
 
                   const SizedBox(height: 16),
@@ -127,6 +136,7 @@ class RegistrationScreen extends StatelessWidget {
                   CustomTextField(
                     hint: "Password",
                     controller: viewModel.passwordController,
+                    focusNode: viewModel.passwordFocusNode,
                     obscureText: true,
                     errorText: viewModel.passwordError,
                   ),
@@ -139,12 +149,17 @@ class RegistrationScreen extends StatelessWidget {
                     color: const Color.fromRGBO(236, 0, 60, 1),
                     onPressed: () {
                       if (viewModel.validateForm()) {
-                        // Proceed to next screen
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Form is valid, proceeding..."),
-                          ),
-                        );
+                        Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                            Registration2Screen(
+                              firstName: viewModel.firstNameController.text.trim(),
+                              lastName: viewModel.lastNameController.text.trim(),
+                              cnic: viewModel.cnicController.text.trim(),
+                              email: viewModel.emailController.text.trim(),
+                              phoneVerification: "+92${viewModel.mobileController.text.trim()}",
+                              phone: "0${viewModel.mobileController.text.trim()}",
+                              password: viewModel.passwordController.text.trim(),
+                            )
+                        ));
                       }
                     },
                   ),

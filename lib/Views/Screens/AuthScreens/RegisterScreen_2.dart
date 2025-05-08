@@ -1,4 +1,7 @@
+import 'package:codex_clock/Services/auth_service.dart';
+import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Register2_VIewModel.dart';
+import 'package:codex_clock/Views/Screens/AuthScreens/OTPVerificationScreen.dart';
 import 'package:codex_clock/Views/Widgets/CustomButton.dart';
 import 'package:codex_clock/Views/Widgets/CustomDropdown.dart';
 import 'package:codex_clock/Views/Widgets/CustomLabel.dart';
@@ -7,12 +10,33 @@ import 'package:codex_clock/Views/Widgets/CustomTextField.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'TakePhotoScreen.dart';
+
 class Registration2Screen extends StatelessWidget {
-  const Registration2Screen({super.key});
+  final String firstName;
+  final String lastName;
+  final String cnic;
+  final String email;
+  final String phoneVerification;
+  final String phone;
+  final String password;
+
+  Registration2Screen({super.key,
+    required this.firstName,
+    required this.lastName,
+    required this.cnic,
+    required this.email,
+    required this.phoneVerification,
+    required this.phone,
+    required this.password
+  });
+
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<SignUpViewModel>(context);
+    final loadingViewModel = Provider.of<LoadingViewModel>(context, listen: true);
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
@@ -30,20 +54,43 @@ class Registration2Screen extends StatelessWidget {
               Center(
                 child: Stack(
                   children: [
-                    Container(
-                      width: 130,
-                      height: 130,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: const Color.fromRGBO(236, 0, 60, 1),
-                          width: 1.5,
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CameraScreen(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 130,
+                        height: 130,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color.fromRGBO(236, 0, 60, 1),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Upload Photo",
+                            style: TextStyle(color: Colors.grey),
+                          ),
                         ),
                       ),
-                      child: const Center(
-                        child: Text(
-                          "Upload Photo",
-                          style: TextStyle(color: Colors.grey),
+                    ),
+                    Positioned(
+                      bottom: 10,
+                      right: 25,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.black,
+                        radius: 14,
+                        child: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 18,
                         ),
                       ),
                     ),
@@ -72,18 +119,20 @@ class Registration2Screen extends StatelessWidget {
                       ),
                       selectedValue: viewModel.selectedDay,
                       onChanged:
-                          (value) => viewModel.setDateOfBirth(
-                            value!,
-                            viewModel.selectedMonth ?? "",
-                            viewModel.selectedYear ?? "",
-                          ),
+                          (value) {
+                            viewModel.setDateOfBirth(
+                              value!,
+                              viewModel.selectedMonth ?? "",
+                              viewModel.selectedYear ?? "",
+                            );
+                      }
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: CustomDropdown(
                       label: "Month",
-                      items: ["Jan", "Feb", "Mar", "Apr", "May"],
+                      items: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
                       selectedValue: viewModel.selectedMonth,
                       onChanged:
                           (value) => viewModel.setDateOfBirth(
@@ -103,11 +152,13 @@ class Registration2Screen extends StatelessWidget {
                       ),
                       selectedValue: viewModel.selectedYear,
                       onChanged:
-                          (value) => viewModel.setDateOfBirth(
-                            viewModel.selectedDay ?? "",
-                            viewModel.selectedMonth ?? "",
-                            value!,
-                          ),
+                          (value) {
+                            viewModel.setDateOfBirth(
+                              viewModel.selectedDay ?? "",
+                              viewModel.selectedMonth ?? "",
+                              value!,
+                            );
+                      }
                     ),
                   ),
                 ],
@@ -119,16 +170,18 @@ class Registration2Screen extends StatelessWidget {
                 onGenderSelected: viewModel.setGender,
               ),
               const SizedBox(height: 15),
-              const CustomLabel(text: "Enter Your Parmenant Address"),
+              const CustomLabel(text: "Enter Your Permanent Address"),
               CustomTextField(
                 hint: "Permanent Address",
                 controller: viewModel.permanentAddressController,
+                focusNode: viewModel.permanentAddressFocusNode,
               ),
               const SizedBox(height: 15),
               const CustomLabel(text: "Enter Your Current Address"),
               CustomTextField(
                 hint: "Current Address",
                 controller: viewModel.currentAddressController,
+                focusNode: viewModel.currentAddressFocusNode,
               ),
               const SizedBox(height: 30),
 
@@ -137,12 +190,34 @@ class Registration2Screen extends StatelessWidget {
                 text: "Sign Up",
                 onPressed: () {
                   if (viewModel.validateForm()) {
-                    // Proceed to next screen
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Form is valid, proceeding..."),
-                      ),
-                    );
+                    print("he");
+                    loadingViewModel.setLoading(true);
+                    _authService.verifyPhoneNumber(phoneVerification).then((value) {
+                      loadingViewModel.setLoading(false);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                          OtpVerificationScreen(
+                            isSignUp: true,
+                            phoneNo: phoneVerification,
+                            verificationId: value,
+                              firstName: firstName,
+                              lastName: lastName,
+                              cnic: cnic,
+                              email: email,
+                              phone: phone,
+                              password: password,
+                              category: viewModel.selectedCategory ?? '',
+                              dateOfBirth: {
+                                'Day': viewModel.selectedDay ?? '1',
+                                'Month': viewModel.selectedMonth ?? 'Jan',
+                                'Year': viewModel.selectedYear ?? '2025'
+                              },
+                              gender: viewModel.selectedGender,
+                              permanentAddress: viewModel.permanentAddressController.text.trim(),
+                              currentAddress: viewModel.currentAddressController.text.trim()
+                          )
+                      ));
+                    });
+
                   }
                 },
               ),

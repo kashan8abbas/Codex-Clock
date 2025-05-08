@@ -1,29 +1,22 @@
 import 'package:codex_clock/ViewModels/Attendence_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Leave_ViewModel.dart';
+import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
 import 'package:codex_clock/ViewModels/QRCode_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Register2_VIewModel.dart';
 import 'package:codex_clock/ViewModels/TakePhoto_ViewModel.dart';
-import 'package:codex_clock/Views/Screens/AdditionalScreens/AttendenceScreen.dart';
-import 'package:codex_clock/Views/Screens/AdditionalScreens/LeaveScreen.dart';
-import 'package:codex_clock/Views/Screens/AdditionalScreens/SummaryScreen.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/LoginScreen.dart';
-//import 'package:codex_clock/Views/Screens/HomePages/QR_CodeScreen.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => CameraViewModel()),
-        ChangeNotifierProvider(create: (_) => SignUpViewModel()),
-        ChangeNotifierProvider(create: (_) => QRScannerViewModel()),
-        ChangeNotifierProvider(create: (_) => ApplyLeaveViewModel()),
-        ChangeNotifierProvider(create: (_) => AttendanceModel()),
-      ],
-      child: const MyApp(),
-    ),
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -31,6 +24,29 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: LoginScreen());
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CameraViewModel()),
+        ChangeNotifierProvider(create: (_) => SignUpViewModel()),
+        ChangeNotifierProvider(create: (_) => QRScannerViewModel()),
+        ChangeNotifierProvider(create: (_) => ApplyLeaveViewModel()),
+        ChangeNotifierProvider(create: (_) => AttendanceModel()),
+        ChangeNotifierProvider(create: (_) => LoadingViewModel()),
+      ],
+      child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: LoginScreen(),
+        theme: ThemeData(
+          textSelectionTheme: const TextSelectionThemeData(
+
+            cursorColor: Color.fromRGBO(236, 0, 60, 1),          // Cursor color
+            selectionColor: Color.fromRGBO(236, 0, 60, 1), // Selected text color
+            selectionHandleColor: Color.fromRGBO(236, 0, 60, 1),
+
+            // Drag handle (cursor drag color)
+          ),
+        ),
+      ),
+    );
   }
 }

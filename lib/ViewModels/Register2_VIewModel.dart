@@ -10,6 +10,9 @@ class SignUpViewModel extends ChangeNotifier {
   final TextEditingController currentAddressController =
       TextEditingController();
 
+  final FocusNode permanentAddressFocusNode = FocusNode();
+  final FocusNode currentAddressFocusNode = FocusNode();
+
   // Form validation errors
   String? categoryError;
   String? dayError;
@@ -84,20 +87,7 @@ class SignUpViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setDateOfBirth(String? day, String? month, String? year) {
-    List<String> validDays = List.generate(
-      31,
-      (index) => (index + 1).toString(),
-    );
-    List<String> validMonths = ["Jan", "Feb", "Mar", "Apr", "May"];
-    List<String> validYears = List.generate(
-      50,
-      (index) => (2025 - index).toString(),
-    );
-
-    if (day != null && !validDays.contains(day)) return;
-    if (month != null && !validMonths.contains(month)) return;
-    if (year != null && !validYears.contains(year)) return;
+  void setDateOfBirth(String day, String month, String year) {
 
     selectedDay = day;
     selectedMonth = month;

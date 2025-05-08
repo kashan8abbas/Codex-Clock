@@ -2,6 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class OtpViewModel {
+
+  final TextEditingController otpController =
+  TextEditingController();
+
   final ValueNotifier<int> secondsRemaining = ValueNotifier<int>(47);
   Timer? _timer;
 

@@ -1,20 +1,56 @@
+import 'package:codex_clock/Services/auth_service.dart';
+import 'package:codex_clock/Utils/Utilities.dart';
+import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/HomePages/HomeScreen.dart';
 import 'package:codex_clock/Views/Widgets/CustomButton.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pinput/pinput.dart';
-import 'package:codex_clock/ViewModels/OTP_ViewModel.dart'; // Import ViewModel
+import 'package:codex_clock/ViewModels/OTP_ViewModel.dart';
+import 'package:provider/provider.dart'; // Import ViewModel
 
 class OtpVerificationScreen extends StatefulWidget {
-  const OtpVerificationScreen({Key? key}) : super(key: key);
+  final String phoneNo;
+  final String verificationId;
+  final bool isSignUp;
+  final String? firstName;
+  final String? lastName;
+  final String? cnic;
+  final String? email;
+  final String? phone;
+  final String? password;
+  final String? category;
+  final Map<String, dynamic>? dateOfBirth;
+  final String? gender;
+  final String? permanentAddress;
+  final String? currentAddress;
+  const OtpVerificationScreen({super.key,
+    required this.phoneNo,
+    required this.verificationId,
+    required this.isSignUp,
+    this.firstName,
+    this.lastName,
+    this.cnic,
+    this.email,
+    this.phone,
+    this.password,
+    this.category,
+    this.dateOfBirth,
+    this.gender,
+    this.permanentAddress,
+    this.currentAddress
+  });
 
   @override
   _OtpVerificationScreenState createState() => _OtpVerificationScreenState();
 }
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
+
   final OtpViewModel otpViewModel = OtpViewModel(); // Initialize ViewModel
+
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -31,6 +67,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    final loadingViewModel = Provider.of<LoadingViewModel>(context, listen: true);
     //double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
@@ -50,35 +87,32 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 40),
-
-            // Illustration Image
             SvgPicture.asset(
               "lib/Utils/Images/OTPVerification.svg",
               height: 170,
             ),
-
-            const SizedBox(height: 40),
-
             // Title & Description
-            const Text(
-              "Confirm your Phone Number",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Column(
+              children: [
+                const Text(
+                  "Confirm your Phone Number",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  "Enter the verification code sent to\n+92 ${widget.phoneNo}",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.black),
+                ),
+              ],
             ),
-            const SizedBox(height: 5),
-            const Text(
-              "Enter the verification code sent to\n+92 3xxxxxxxxx",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.black),
-            ),
-
-            const SizedBox(height: 25),
-
             // OTP Input Fields
             Pinput(
               length: 6,
+              controller: otpViewModel.otpController,
               defaultPinTheme: PinTheme(
                 width: 50,
                 height: screenHeight / 16,
@@ -95,22 +129,54 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 25),
-
             // Confirm Button
             CustomButton(
               text: "Confirm",
               color: const Color.fromRGBO(236, 0, 60, 1),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
-                );
+                if(otpViewModel.otpController.text.length >= 6) {
+                  loadingViewModel.setLoading(true);
+                  if(widget.isSignUp) {
+                    _authService.signUpService(
+                        verificationId: widget.verificationId,
+                        smsCode: otpViewModel.otpController.text,
+                        firstName: widget.firstName ?? '',
+                        lastName: widget.lastName ?? '',
+                        cnic: widget.cnic ?? '',
+                        email: widget.email ?? '',
+                        phone: widget.phone ?? '',
+                        password: widget.password ?? '',
+                        position: widget.category ?? '',
+                        dateOfBirth: widget.dateOfBirth ?? {
+                          'Day':  1,
+                          'Month': 1,
+                          'Year': 2025
+                        },
+                        gender: widget.gender ?? '',
+                        permanentAddress: widget.permanentAddress ?? '',
+                        currentAddress: widget.currentAddress ?? '').then((_) {
+                          Utilities().successMsg('Account Created Successfully');
+                    });
+
+                  }
+                  else {
+                    _authService.signInWithOTP(otpViewModel.otpController.text, widget.verificationId).then((value) {
+                      loadingViewModel.setLoading(false);
+                      if(value == '') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                        );
+                      }
+                      else {
+                        Utilities().errorMsg(value);
+                      }
+                    });
+                  }
+                }
+
               },
             ),
-
-            const SizedBox(height: 20),
-
             // Resend Timer
             ValueListenableBuilder<int>(
               valueListenable: otpViewModel.secondsRemaining,

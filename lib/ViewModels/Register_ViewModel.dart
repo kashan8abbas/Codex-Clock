@@ -9,6 +9,14 @@ class RegistrationViewModel extends ChangeNotifier {
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  final FocusNode firstNameFocusNode = FocusNode();
+  final FocusNode lastNameFocusNode = FocusNode();
+  final FocusNode cnicFocusNode = FocusNode();
+  final FocusNode emailFocusNode = FocusNode();
+  final FocusNode mobileFocusNode = FocusNode();
+  final FocusNode passwordFocusNode = FocusNode();
+
+
   // Form validation errors
   String? firstNameError;
   String? lastNameError;
@@ -58,8 +66,8 @@ class RegistrationViewModel extends ChangeNotifier {
 
     // Mobile number validation (Pakistan format check)
     if (mobileController.text.isEmpty ||
-        !RegExp(r'^\d{11}$').hasMatch(mobileController.text)) {
-      mobileError = "Enter a valid 11-digit mobile number";
+        !RegExp(r'^\d{10}$').hasMatch(mobileController.text)) {
+      mobileError = "Enter a valid 10-digit mobile number";
       isValid = false;
     } else {
       mobileError = null;

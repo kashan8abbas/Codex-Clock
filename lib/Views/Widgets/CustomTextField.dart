@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextField extends StatelessWidget {
   final String hint;
   final TextEditingController controller;
+  final FocusNode focusNode;
   final bool obscureText;
   final bool isPhoneField;
+  final bool isCnic;
   final String? errorText;
 
   const CustomTextField({
     super.key,
     required this.hint,
     required this.controller,
+    required this.focusNode,
     this.obscureText = false,
     this.isPhoneField =
         false, // Default is false, set true for phone number fields
+    this.isCnic = false,
     this.errorText,
   });
 
@@ -38,6 +43,7 @@ class CustomTextField extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (isPhoneField) ...[
                 Container(
@@ -66,8 +72,10 @@ class CustomTextField extends StatelessWidget {
                 child: TextField(
                   controller: controller,
                   obscureText: obscureText,
+                  focusNode: focusNode,
+                  onTapOutside: (event) => focusNode.unfocus(),
                   keyboardType:
-                      isPhoneField ? TextInputType.phone : TextInputType.text,
+                      isPhoneField ? TextInputType.phone : isCnic ? TextInputType.number : TextInputType.text,
                   decoration: InputDecoration(
                     hintText: hint,
                     border: InputBorder.none,
