@@ -1,6 +1,8 @@
 import 'package:codex_clock/Services/auth_service.dart';
+import 'package:codex_clock/Services/user_service.dart';
 import 'package:codex_clock/Utils/Utilities.dart';
 import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
+import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/HomePages/HomeScreen.dart';
 import 'package:codex_clock/Views/Widgets/CustomButton.dart';
 import 'package:flutter/gestures.dart';
@@ -51,6 +53,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final OtpViewModel otpViewModel = OtpViewModel(); // Initialize ViewModel
 
   final AuthService _authService = AuthService();
+  final UserService _userService = UserService();
 
   @override
   void initState() {
@@ -68,6 +71,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     final loadingViewModel = Provider.of<LoadingViewModel>(context, listen: true);
+    final userDataViewModel = Provider.of<UserDataViewModel>(context, listen: true);
     //double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
@@ -103,7 +107,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  "Enter the verification code sent to\n+92 ${widget.phoneNo}",
+                  widget.isSignUp ? "Enter the verification code sent to\n+92 ${widget.phoneNo.substring(3)}" : "Enter the verification code sent to\n+92 ${widget.phoneNo}",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 14, color: Colors.black),
                 ),
@@ -137,39 +141,97 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 if(otpViewModel.otpController.text.length >= 6) {
                   loadingViewModel.setLoading(true);
                   if(widget.isSignUp) {
-                    _authService.signUpService(
-                        verificationId: widget.verificationId,
-                        smsCode: otpViewModel.otpController.text,
-                        firstName: widget.firstName ?? '',
-                        lastName: widget.lastName ?? '',
-                        cnic: widget.cnic ?? '',
-                        email: widget.email ?? '',
-                        phone: widget.phone ?? '',
-                        password: widget.password ?? '',
-                        position: widget.category ?? '',
-                        dateOfBirth: widget.dateOfBirth ?? {
-                          'Day':  1,
-                          'Month': 1,
-                          'Year': 2025
-                        },
-                        gender: widget.gender ?? '',
-                        permanentAddress: widget.permanentAddress ?? '',
-                        currentAddress: widget.currentAddress ?? '').then((_) {
-                          Utilities().successMsg('Account Created Successfully');
+                    _authService.signInWithOTP(otpViewModel.otpController.text, widget.verificationId).then((value) {
+                      if(value['status'] == 'success') {
+                        _authService.signUpService(
+                            verificationId: widget.verificationId,
+                            smsCode: otpViewModel.otpController.text,
+                            phoneCredential: value['credentials'],
+                            firstName: widget.firstName ?? '',
+                            lastName: widget.lastName ?? '',
+                            cnic: widget.cnic ?? '',
+                            email: widget.email ?? '',
+                            phone: widget.phone ?? '',
+                            password: widget.password ?? '',
+                            position: widget.category ?? '',
+                            dateOfBirth: widget.dateOfBirth ?? {
+                              'Day':  1,
+                              'Month': 1,
+                              'Year': 2025
+                            },
+                            gender: widget.gender ?? '',
+                            permanentAddress: widget.permanentAddress ?? '',
+                            currentAddress: widget.currentAddress ?? '').then((_) {
+                          _userService.fetchCurrentUserData().then((userData) {
+                            if(userData != null) {
+                              userDataViewModel.updateUserData(
+                                  userData["Uid"],
+                                  userData["cnic"],
+                                  userData["currentAddress"],
+                                  userData["dateOfBirth"],
+                                  userData["email"],
+                                  userData["firstName"],
+                                  userData["gender"],
+                                  userData["lastName"],
+                                  userData["permanentAddress"],
+                                  userData["phone"],
+                                  userData["position"]);
+                              loadingViewModel.setLoading(false);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HomeScreen(),
+                                ),
+                              );
+                            }
+                            else {
+                              loadingViewModel.setLoading(false);
+                              Utilities().errorMsg('Error Fetching User Data');
+                            }
+                          });
+                        });
+                      }
+                      else {
+                        loadingViewModel.setLoading(false);
+                        Utilities().errorMsg(value['error']);
+                      }
                     });
 
                   }
                   else {
                     _authService.signInWithOTP(otpViewModel.otpController.text, widget.verificationId).then((value) {
-                      loadingViewModel.setLoading(false);
-                      if(value == '') {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
-                        );
+                      if(value['status'] == 'success') {
+                        _userService.fetchCurrentUserData().then((userData) {
+                          if(userData != null) {
+                            userDataViewModel.updateUserData(
+                                userData["Uid"],
+                                userData["cnic"],
+                                userData["currentAddress"],
+                                userData["dateOfBirth"],
+                                userData["email"],
+                                userData["firstName"],
+                                userData["gender"],
+                                userData["lastName"],
+                                userData["permanentAddress"],
+                                userData["phone"],
+                                userData["position"]);
+                            loadingViewModel.setLoading(false);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomeScreen(),
+                              ),
+                            );
+                          }
+                          else {
+                            loadingViewModel.setLoading(false);
+                            Utilities().errorMsg('Error Fetching User Data');
+                          }
+                        });
                       }
                       else {
-                        Utilities().errorMsg(value);
+                        loadingViewModel.setLoading(false);
+                        Utilities().errorMsg(value['error']);
                       }
                     });
                   }

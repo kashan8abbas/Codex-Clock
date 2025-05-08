@@ -4,7 +4,9 @@ import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
 import 'package:codex_clock/ViewModels/QRCode_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Register2_VIewModel.dart';
 import 'package:codex_clock/ViewModels/TakePhoto_ViewModel.dart';
-import 'package:codex_clock/Views/Screens/AuthScreens/LoginScreen.dart';
+import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
+import 'package:codex_clock/Views/Screens/AuthScreens/EmailLoginScreen.dart';
+import 'package:codex_clock/Views/Screens/AuthScreens/PhoneLoginScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,10 +34,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ApplyLeaveViewModel()),
         ChangeNotifierProvider(create: (_) => AttendanceModel()),
         ChangeNotifierProvider(create: (_) => LoadingViewModel()),
+        ChangeNotifierProvider(create: (_) => UserDataViewModel()),
+
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: LoginScreen(),
+          home: EmailLoginScreen(),
         theme: ThemeData(
           textSelectionTheme: const TextSelectionThemeData(
 

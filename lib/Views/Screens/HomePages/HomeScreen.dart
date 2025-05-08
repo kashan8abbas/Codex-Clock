@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/HomePages/QR_CodeScreen.dart';
 import 'package:codex_clock/Views/Widgets/CustomDrawer.dart';
 import 'package:codex_clock/Views/Widgets/CustomNavbar.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -65,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //double screenHeight = MediaQuery.of(context).size.height;
+    final userDataViewModel = Provider.of<UserDataViewModel>(context, listen: true);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
@@ -129,8 +131,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             const Spacer(),
 
-                            const Text(
-                              "M Waleed",
+                            Text(
+                              "${userDataViewModel.firstName} ${userDataViewModel.lastName}",
                               style: TextStyle(
                                 fontSize: 25,
                                 fontWeight: FontWeight.bold,

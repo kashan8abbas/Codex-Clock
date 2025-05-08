@@ -1,6 +1,6 @@
 import 'package:codex_clock/Services/auth_service.dart';
 import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
-import 'package:codex_clock/ViewModels/Login_ViewModel.dart';
+import 'package:codex_clock/ViewModels/PhoneLogin_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/OTPVerificationScreen.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/RegisterScreen.dart';
 import 'package:codex_clock/Views/Widgets/CustomButton.dart';
@@ -9,15 +9,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-class LoginScreen extends StatelessWidget {
+class PhoneLoginScreen extends StatelessWidget {
 
   final AuthService _authService = AuthService();
+
+  PhoneLoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => LoginViewModel(),
-      child: Consumer2<LoginViewModel, LoadingViewModel>(
+      create: (_) => PhoneLoginViewModel(),
+      child: Consumer2<PhoneLoginViewModel, LoadingViewModel>(
         builder: (context, viewModel, loadingViewModel, child) {
           return Scaffold(
             backgroundColor: const Color.fromRGBO(246, 245, 248, 1),

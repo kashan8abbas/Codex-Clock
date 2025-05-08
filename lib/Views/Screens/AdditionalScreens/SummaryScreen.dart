@@ -1,6 +1,6 @@
 import 'package:codex_clock/ViewModels/Summary_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AdditionalScreens/AttendenceScreen.dart';
-import 'package:codex_clock/Views/Screens/AuthScreens/LoginScreen.dart';
+import 'package:codex_clock/Views/Screens/AuthScreens/PhoneLoginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';

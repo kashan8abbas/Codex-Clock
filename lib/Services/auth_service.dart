@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:codex_clock/Utils/Utilities.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
@@ -33,7 +34,7 @@ class AuthService {
     return completer.future;
   }
 
-  Future<String> signInWithOTP(String smsCode, String verificationId) async {
+  Future<Map<String, dynamic>> signInWithOTP(String smsCode, String verificationId) async {
     try {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
@@ -41,17 +42,42 @@ class AuthService {
       );
 
       await auth.signInWithCredential(credential);
-      return '';
+      return {
+        'credentials': credential,
+        'status': 'success'
+      };
     }
     on FirebaseAuthException catch (e) {
-      print(e.message);
-      return e.message.toString();
+      return {
+        'error': e.message.toString(),
+        'status': 'failed',
+      };
     }
+  }
+
+  Future<User?> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      UserCredential userCredential = await auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      Utilities().getMessageFromErrorCode(e.code);
+    } catch (e) {
+      throw Exception('An unexpected error occurred: $e');
+    }
+    return null;
   }
 
   Future<void> signUpService({
     required String verificationId,
     required String smsCode,
+    required PhoneAuthCredential phoneCredential,
     required String firstName,
     required String lastName,
     required String cnic,
@@ -68,11 +94,6 @@ class AuthService {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     try {
-      // Step 1: Create phone credential and sign in (temporary user)
-      PhoneAuthCredential phoneCredential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: smsCode,
-      );
 
       UserCredential phoneUser = await auth.signInWithCredential(phoneCredential);
       User? user = phoneUser.user;
@@ -103,7 +124,7 @@ class AuthService {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      print("User created and data stored.");
+
     } catch (e) {
       print("Sign up failed: $e");
       rethrow;
