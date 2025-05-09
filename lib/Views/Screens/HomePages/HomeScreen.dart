@@ -54,7 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     if (_selectedIndex == 2) {
-      // Use the scaffold key to open the drawer
       _scaffoldKey.currentState?.openEndDrawer();
     }
   }

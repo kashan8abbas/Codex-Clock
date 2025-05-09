@@ -32,14 +32,9 @@ class CustomTextField extends StatelessWidget {
         Container(
           height: screenHeight / 17,
           decoration: BoxDecoration(
-            color: const Color.fromRGBO(
-              236,
-              0,
-              60,
-              0.15,
-            ), // Light red background
+            color: Colors.white, // Light red background
             borderRadius: BorderRadius.circular(10),
-            border: errorText != null ? Border.all(color: Colors.red) : null,
+            border: Border.all(color: Color.fromRGBO(236, 0, 60, 1)) ,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(

@@ -46,11 +46,11 @@ class _CustomradioState extends State<Customradio> {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color.fromRGBO(236, 0, 60, 0.15),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: isSelected ? Colors.red : Colors.transparent,
-                    width: isSelected ? 2 : 0,
+                    color: isSelected ? Color.fromRGBO(236, 0, 60, 1) : Colors.transparent,
+                    width: isSelected ? 1 : 0,
                   ),
                   boxShadow: [
                     BoxShadow(

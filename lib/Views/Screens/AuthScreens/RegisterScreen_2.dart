@@ -40,17 +40,27 @@ class Registration2Screen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
-      appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 50, left: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(Icons.arrow_back_ios),
+                    ),
+                    SizedBox(height: 1,)
+                  ],
+                ),
+              ),
               Center(
                 child: Stack(
                   children: [
@@ -97,7 +107,7 @@ class Registration2Screen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 15),
               CustomDropdown(
                 label: "Select Your",
                 items: ["Option 1", "Option 2"],
@@ -183,14 +193,13 @@ class Registration2Screen extends StatelessWidget {
                 controller: viewModel.currentAddressController,
                 focusNode: viewModel.currentAddressFocusNode,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
 
               CustomButton(
                 color: Color.fromRGBO(236, 0, 60, 1),
                 text: "Sign Up",
                 onPressed: () {
                   if (viewModel.validateForm()) {
-                    print("he");
                     loadingViewModel.setLoading(true);
                     _authService.verifyPhoneNumber(phoneVerification).then((value) {
                       loadingViewModel.setLoading(false);

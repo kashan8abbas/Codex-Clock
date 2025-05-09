@@ -29,14 +29,21 @@ class CustomDropdown extends StatelessWidget {
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color.fromRGBO(236, 0, 60, 1)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color.fromRGBO(236, 0, 60, 1), width: 1),
             ),
             filled: true,
-            fillColor: Color.fromRGBO(236, 0, 60, 0.15),
+            fillColor: Colors.white,
           ),
           items:
               items.map((String item) {
-                return DropdownMenuItem<String>(value: item, child: Text(item));
+                return DropdownMenuItem<String>(value: item, child: Text(item), );
               }).toList(),
           onChanged: onChanged,
         ),
