@@ -66,37 +66,14 @@ class PhoneLoginScreen extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => OtpVerificationScreen(phoneNo: viewModel.phoneController.text, verificationId: value, isSignUp: false,),
+                                  builder: (context) => OtpVerificationScreen(phoneNo: viewModel.phoneController.text, verificationId: value),
                                 ),
                               );
                             });
                           }
                         },
                       ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => RegistrationScreen(),
-                                ),
-                              );
-                            },
-                            child: const Text(
-                              "Create Account",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Color.fromRGBO(236, 0, 60, 1),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+
                     ],
                   ),
                 ),

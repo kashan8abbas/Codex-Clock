@@ -1,6 +1,10 @@
 import 'package:codex_clock/Services/auth_service.dart';
+import 'package:codex_clock/Services/user_service.dart';
+import 'package:codex_clock/Utils/Utilities.dart';
 import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Register2_VIewModel.dart';
+import 'package:codex_clock/ViewModels/TakePhoto_ViewModel.dart';
+import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/OTPVerificationScreen.dart';
 import 'package:codex_clock/Views/Widgets/CustomButton.dart';
 import 'package:codex_clock/Views/Widgets/CustomDropdown.dart';
@@ -10,33 +14,37 @@ import 'package:codex_clock/Views/Widgets/CustomTextField.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../HomePages/HomeScreen.dart';
 import 'TakePhotoScreen.dart';
 
 class Registration2Screen extends StatelessWidget {
+  final String uid;
   final String firstName;
   final String lastName;
   final String cnic;
-  final String email;
-  final String phoneVerification;
+  final String permanentAddress;
+  final String currentAddress;
   final String phone;
-  final String password;
 
   Registration2Screen({super.key,
+    required this.uid,
     required this.firstName,
     required this.lastName,
     required this.cnic,
-    required this.email,
-    required this.phoneVerification,
-    required this.phone,
-    required this.password
+    required this.permanentAddress,
+    required this.currentAddress,
+    required this.phone
   });
 
   final AuthService _authService = AuthService();
+  final UserService _userService = UserService();
 
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<SignUpViewModel>(context);
     final loadingViewModel = Provider.of<LoadingViewModel>(context, listen: true);
+    final cameraViewModel = Provider.of<CameraViewModel>(context, listen: true);
+    final userDataViewModel = Provider.of<UserDataViewModel>(context, listen: true);
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
@@ -65,13 +73,14 @@ class Registration2Screen extends StatelessWidget {
                 child: Stack(
                   children: [
                     TextButton(
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CameraScreen(),
                           ),
                         );
+                        // If you plan to return the selected image from CameraScreen, handle it here
                       },
                       child: Container(
                         width: 130,
@@ -80,18 +89,28 @@ class Registration2Screen extends StatelessWidget {
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: const Color.fromRGBO(236, 0, 60, 1),
-                            width: 1.5,
+                            width: 2.5,
                           ),
                         ),
-                        child: const Center(
+                        child: cameraViewModel.selectedImage == null
+                            ? const Center(
                           child: Text(
                             "Upload Photo",
                             style: TextStyle(color: Colors.grey),
                           ),
+                        )
+                            : ClipOval(
+                          child: Image.file(
+                            cameraViewModel.selectedImage!,
+                            fit: BoxFit.cover,
+                            width: 130,
+                            height: 130,
+                          ),
                         ),
                       ),
                     ),
-                    Positioned(
+
+                    cameraViewModel.selectedImage == null ? Positioned(
                       bottom: 10,
                       right: 25,
                       child: CircleAvatar(
@@ -103,10 +122,11 @@ class Registration2Screen extends StatelessWidget {
                           size: 18,
                         ),
                       ),
-                    ),
+                    ) : SizedBox(),
                   ],
                 ),
               ),
+
               const SizedBox(height: 15),
               CustomDropdown(
                 label: "Select Your",
@@ -114,8 +134,8 @@ class Registration2Screen extends StatelessWidget {
                 selectedValue: viewModel.selectedCategory,
                 onChanged: viewModel.setCategory,
               ),
-              const SizedBox(height: 15),
 
+              const SizedBox(height: 15),
               const CustomLabel(text: "Date of Birth"),
               const SizedBox(height: 5),
               Row(
@@ -173,58 +193,67 @@ class Registration2Screen extends StatelessWidget {
                   ),
                 ],
               ),
+
               const SizedBox(height: 15),
               CustomLabel(text: "Gender"),
               Customradio(
                 genderList: ["Male", "Female"],
                 onGenderSelected: viewModel.setGender,
               ),
-              const SizedBox(height: 15),
-              const CustomLabel(text: "Enter Your Permanent Address"),
-              CustomTextField(
-                hint: "Permanent Address",
-                controller: viewModel.permanentAddressController,
-                focusNode: viewModel.permanentAddressFocusNode,
-              ),
-              const SizedBox(height: 15),
-              const CustomLabel(text: "Enter Your Current Address"),
-              CustomTextField(
-                hint: "Current Address",
-                controller: viewModel.currentAddressController,
-                focusNode: viewModel.currentAddressFocusNode,
-              ),
-              const SizedBox(height: 15),
 
+              const SizedBox(height: 15),
               CustomButton(
                 color: Color.fromRGBO(236, 0, 60, 1),
                 text: "Sign Up",
                 onPressed: () {
                   if (viewModel.validateForm()) {
                     loadingViewModel.setLoading(true);
-                    _authService.verifyPhoneNumber(phoneVerification).then((value) {
-                      loadingViewModel.setLoading(false);
-                      Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                          OtpVerificationScreen(
-                            isSignUp: true,
-                            phoneNo: phoneVerification,
-                            verificationId: value,
-                              firstName: firstName,
-                              lastName: lastName,
-                              cnic: cnic,
-                              email: email,
-                              phone: phone,
-                              password: password,
-                              category: viewModel.selectedCategory ?? '',
-                              dateOfBirth: {
-                                'Day': viewModel.selectedDay ?? '1',
-                                'Month': viewModel.selectedMonth ?? 'Jan',
-                                'Year': viewModel.selectedYear ?? '2025'
-                              },
-                              gender: viewModel.selectedGender,
-                              permanentAddress: viewModel.permanentAddressController.text.trim(),
-                              currentAddress: viewModel.currentAddressController.text.trim()
-                          )
-                      ));
+                    _authService.signUpService(
+                      uid: uid,
+                      firstName: firstName,
+                      lastName: lastName,
+                      cnic: cnic,
+                      permanentAddress: permanentAddress,
+                      currentAddress: currentAddress,
+                      dateOfBirth: {
+                        'day': viewModel.selectedDay,
+                        'month': viewModel.selectedMonth,
+                        'year': viewModel.selectedYear
+                      },
+                      gender: viewModel.selectedGender,
+                      phone: phone,
+                      position: viewModel.selectedCategory!
+                    ).then((value) {
+                      _userService.fetchCurrentUserData().then((userData) {
+                        if(userData != null) {
+                          userDataViewModel.updateUserData(
+                              userData["Uid"],
+                              userData["cnic"],
+                              userData["currentAddress"],
+                              userData["dateOfBirth"],
+                              userData["email"] ?? '',
+                              userData["firstName"],
+                              userData["gender"],
+                              userData["lastName"],
+                              userData["permanentAddress"],
+                              userData["phone"],
+                              userData["position"]);
+                          loadingViewModel.setLoading(false);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomeScreen(),
+                            ),
+                          );
+                        }
+                        else{
+                          loadingViewModel.setLoading(false);
+                          Utilities().errorMsg('Error Fetching User Data');
+                        }
+
+                      });
+
+
                     });
 
                   }

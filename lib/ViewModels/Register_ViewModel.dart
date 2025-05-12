@@ -5,25 +5,22 @@ class RegistrationViewModel extends ChangeNotifier {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController cnicController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController mobileController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController permanentAddressController = TextEditingController();
+  final TextEditingController currentAddressController = TextEditingController();
 
   final FocusNode firstNameFocusNode = FocusNode();
   final FocusNode lastNameFocusNode = FocusNode();
   final FocusNode cnicFocusNode = FocusNode();
-  final FocusNode emailFocusNode = FocusNode();
-  final FocusNode mobileFocusNode = FocusNode();
-  final FocusNode passwordFocusNode = FocusNode();
+  final FocusNode permanentAddressFocusNode = FocusNode();
+  final FocusNode currentAddressFocusNode = FocusNode();
 
 
   // Form validation errors
   String? firstNameError;
   String? lastNameError;
   String? cnicError;
-  String? emailError;
-  String? mobileError;
-  String? passwordError;
+  String? permanentError;
+  String? currentError;
 
   bool validateForm() {
     bool isValid = true;
@@ -45,7 +42,7 @@ class RegistrationViewModel extends ChangeNotifier {
     }
 
     // CNIC validation (Pakistan format check)
-    if (cnicController.text.isEmpty ||
+    if (cnicController.text.isEmpty |
         !RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(cnicController.text)) {
       cnicError = "Enter a valid CNIC (XXXXX-XXXXXXX-X)";
       isValid = false;
@@ -53,44 +50,33 @@ class RegistrationViewModel extends ChangeNotifier {
       cnicError = null;
     }
 
-    // Email validation
-    if (emailController.text.isEmpty ||
-        !RegExp(
-          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$',
-        ).hasMatch(emailController.text)) {
-      emailError = "Enter a valid email";
-      isValid = false;
-    } else {
-      emailError = null;
-    }
-
     // Mobile number validation (Pakistan format check)
-    if (mobileController.text.isEmpty ||
-        !RegExp(r'^\d{10}$').hasMatch(mobileController.text)) {
-      mobileError = "Enter a valid 10-digit mobile number";
+    if (permanentAddressController.text.isEmpty) {
+      permanentError = "Permanent address is required";
       isValid = false;
     } else {
-      mobileError = null;
+      permanentError = null;
     }
 
-    // Password validation
-    if (passwordController.text.length < 6) {
-      passwordError = "Password must be at least 6 characters";
+    if (currentAddressController.text.isEmpty) {
+      currentError = "Current address is required";
       isValid = false;
     } else {
-      passwordError = null;
+      currentError = null;
     }
+
 
     notifyListeners(); // Update UI if needed
     return isValid;
   }
 
-  void disposeControllers() {
+  @override
+  void dispose() {
     firstNameController.dispose();
     lastNameController.dispose();
     cnicController.dispose();
-    emailController.dispose();
-    mobileController.dispose();
-    passwordController.dispose();
+    permanentAddressController.dispose();
+    currentAddressController.dispose();
+    super.dispose();
   }
 }

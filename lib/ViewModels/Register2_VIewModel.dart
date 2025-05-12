@@ -5,13 +5,6 @@ class SignUpViewModel extends ChangeNotifier {
   String? selectedDay, selectedMonth, selectedYear;
   String selectedGender = "Male";
 
-  final TextEditingController permanentAddressController =
-      TextEditingController();
-  final TextEditingController currentAddressController =
-      TextEditingController();
-
-  final FocusNode permanentAddressFocusNode = FocusNode();
-  final FocusNode currentAddressFocusNode = FocusNode();
 
   // Form validation errors
   String? categoryError;
@@ -19,8 +12,7 @@ class SignUpViewModel extends ChangeNotifier {
   String? monthError;
   String? yearError;
   String? genderError;
-  String? permanentError;
-  String? currentError;
+
 
   bool validateForm() {
     bool isValid = true;
@@ -63,20 +55,6 @@ class SignUpViewModel extends ChangeNotifier {
       genderError = null;
     }
 
-    // Address validation
-    if (permanentAddressController.text.isEmpty) {
-      permanentError = "Permanent address is required";
-      isValid = false;
-    } else {
-      permanentError = null;
-    }
-
-    if (currentAddressController.text.isEmpty) {
-      currentError = "Current address is required";
-      isValid = false;
-    } else {
-      currentError = null;
-    }
 
     notifyListeners();
     return isValid;
@@ -101,19 +79,10 @@ class SignUpViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void signUp() {
-    // Handle sign-up logic here
-    print("Category: $selectedCategory");
-    print("DOB: $selectedDay-$selectedMonth-$selectedYear");
-    print("Gender: $selectedGender");
-    print("Permanent Address: ${permanentAddressController.text}");
-    print("Current Address: ${currentAddressController.text}");
-  }
 
   @override
   void dispose() {
-    permanentAddressController.dispose();
-    currentAddressController.dispose();
+
     super.dispose();
   }
 }

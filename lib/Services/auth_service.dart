@@ -13,7 +13,7 @@ class AuthService {
 
     await auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
-      timeout: const Duration(seconds: 60),
+      timeout: const Duration(seconds: 120),
       verificationCompleted: (PhoneAuthCredential credential) async {
         await auth.signInWithCredential(credential);
         print('User signed in automatically');
@@ -41,9 +41,14 @@ class AuthService {
         smsCode: smsCode,
       );
 
-      await auth.signInWithCredential(credential);
+      UserCredential phoneUser = await auth.signInWithCredential(credential);
+      User? user = phoneUser.user;
+
+
+      String uid = user!.uid;
+
       return {
-        'credentials': credential,
+        'uid': uid,
         'status': 'success'
       };
     }
@@ -75,15 +80,11 @@ class AuthService {
   }
 
   Future<void> signUpService({
-    required String verificationId,
-    required String smsCode,
-    required PhoneAuthCredential phoneCredential,
+    required String uid,
     required String firstName,
     required String lastName,
     required String cnic,
-    required String email,
     required String phone,
-    required String password,
     required String position,
     required Map<String, dynamic> dateOfBirth,
     required String gender,
@@ -95,18 +96,7 @@ class AuthService {
 
     try {
 
-      UserCredential phoneUser = await auth.signInWithCredential(phoneCredential);
-      User? user = phoneUser.user;
 
-      // Step 2: Link email/password to the phone-authenticated user
-      AuthCredential emailCredential = EmailAuthProvider.credential(
-        email: email,
-        password: password,
-      );
-
-      await user!.linkWithCredential(emailCredential);
-
-      String uid = user.uid;
 
       // Step 3: Store user data in Firestore
       await firestore.collection("Users").doc(uid).set({
@@ -114,7 +104,6 @@ class AuthService {
         'firstName': firstName,
         'lastName': lastName,
         'cnic': cnic,
-        'email': email,
         'phone': phone,
         'position': position,
         'dateOfBirth': dateOfBirth,
@@ -126,7 +115,6 @@ class AuthService {
 
 
     } catch (e) {
-      print("Sign up failed: $e");
       rethrow;
     }
   }

@@ -5,12 +5,12 @@ import 'package:image_picker/image_picker.dart';
 
 class CameraViewModel extends ChangeNotifier {
   CameraController? _cameraController;
-  List<File> _recentImages = [];
   bool _isCameraInitialized = false;
+  File? _selectedImage;
 
   CameraController? get cameraController => _cameraController;
-  List<File> get recentImages => _recentImages;
   bool get isCameraInitialized => _isCameraInitialized;
+  File? get selectedImage => _selectedImage;
 
   Future<void> initializeCamera() async {
     try {
@@ -31,26 +31,30 @@ class CameraViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> capturePhoto() async {
+  Future<void> capturePhoto(BuildContext context) async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
       debugPrint("Camera not initialized");
       return;
     }
     try {
       final XFile photo = await _cameraController!.takePicture();
-      _recentImages.add(File(photo.path));
+      _selectedImage = File(photo.path);
       notifyListeners();
+      disposeCamera();
+      Navigator.pop(context);
     } catch (e) {
       debugPrint("Error capturing photo: $e");
     }
   }
 
-  Future<void> pickFromGallery() async {
+  Future<void> pickFromGallery(BuildContext context) async {
     final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
     );
     if (pickedFile != null) {
-      _recentImages.add(File(pickedFile.path));
+      _selectedImage = File(pickedFile.path);
+      disposeCamera();
+      Navigator.pop(context);
       notifyListeners();
     }
   }
@@ -69,9 +73,10 @@ class CameraViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  @override
-  void dispose() {
+  void disposeCamera() {
     _cameraController?.dispose();
-    super.dispose();
+    _cameraController = null;
+    _isCameraInitialized = false;
+    notifyListeners();
   }
 }

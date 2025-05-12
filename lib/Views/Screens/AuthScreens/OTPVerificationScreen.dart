@@ -3,6 +3,7 @@ import 'package:codex_clock/Services/user_service.dart';
 import 'package:codex_clock/Utils/Utilities.dart';
 import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
 import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
+import 'package:codex_clock/Views/Screens/AuthScreens/RegisterScreen.dart';
 import 'package:codex_clock/Views/Screens/HomePages/HomeScreen.dart';
 import 'package:codex_clock/Views/Widgets/CustomButton.dart';
 import 'package:flutter/gestures.dart';
@@ -15,33 +16,10 @@ import 'package:provider/provider.dart'; // Import ViewModel
 class OtpVerificationScreen extends StatefulWidget {
   final String phoneNo;
   final String verificationId;
-  final bool isSignUp;
-  final String? firstName;
-  final String? lastName;
-  final String? cnic;
-  final String? email;
-  final String? phone;
-  final String? password;
-  final String? category;
-  final Map<String, dynamic>? dateOfBirth;
-  final String? gender;
-  final String? permanentAddress;
-  final String? currentAddress;
+
   const OtpVerificationScreen({super.key,
     required this.phoneNo,
     required this.verificationId,
-    required this.isSignUp,
-    this.firstName,
-    this.lastName,
-    this.cnic,
-    this.email,
-    this.phone,
-    this.password,
-    this.category,
-    this.dateOfBirth,
-    this.gender,
-    this.permanentAddress,
-    this.currentAddress
   });
 
   @override
@@ -72,7 +50,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
     final loadingViewModel = Provider.of<LoadingViewModel>(context, listen: true);
     final userDataViewModel = Provider.of<UserDataViewModel>(context, listen: true);
-    //double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
       appBar: AppBar(
@@ -107,7 +84,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  widget.isSignUp ? "Enter the verification code sent to\n+92 ${widget.phoneNo.substring(3)}" : "Enter the verification code sent to\n+92 ${widget.phoneNo}",
+                  "Enter the verification code sent to\n+92 ${widget.phoneNo.substring(3)}",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 14, color: Colors.black),
                 ),
@@ -140,101 +117,41 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               onPressed: () {
                 if(otpViewModel.otpController.text.length >= 6) {
                   loadingViewModel.setLoading(true);
-                  if(widget.isSignUp) {
-                    _authService.signInWithOTP(otpViewModel.otpController.text, widget.verificationId).then((value) {
-                      if(value['status'] == 'success') {
-                        _authService.signUpService(
-                            verificationId: widget.verificationId,
-                            smsCode: otpViewModel.otpController.text,
-                            phoneCredential: value['credentials'],
-                            firstName: widget.firstName ?? '',
-                            lastName: widget.lastName ?? '',
-                            cnic: widget.cnic ?? '',
-                            email: widget.email ?? '',
-                            phone: widget.phone ?? '',
-                            password: widget.password ?? '',
-                            position: widget.category ?? '',
-                            dateOfBirth: widget.dateOfBirth ?? {
-                              'Day':  1,
-                              'Month': 1,
-                              'Year': 2025
-                            },
-                            gender: widget.gender ?? '',
-                            permanentAddress: widget.permanentAddress ?? '',
-                            currentAddress: widget.currentAddress ?? '').then((_) {
-                          _userService.fetchCurrentUserData().then((userData) {
-                            if(userData != null) {
-                              userDataViewModel.updateUserData(
-                                  userData["Uid"],
-                                  userData["cnic"],
-                                  userData["currentAddress"],
-                                  userData["dateOfBirth"],
-                                  userData["email"],
-                                  userData["firstName"],
-                                  userData["gender"],
-                                  userData["lastName"],
-                                  userData["permanentAddress"],
-                                  userData["phone"],
-                                  userData["position"]);
-                              loadingViewModel.setLoading(false);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => HomeScreen(),
-                                ),
-                              );
-                            }
-                            else {
-                              loadingViewModel.setLoading(false);
-                              Utilities().errorMsg('Error Fetching User Data');
-                            }
-                          });
-                        });
-                      }
-                      else {
-                        loadingViewModel.setLoading(false);
-                        Utilities().errorMsg(value['error']);
-                      }
-                    });
-
-                  }
-                  else {
-                    _authService.signInWithOTP(otpViewModel.otpController.text, widget.verificationId).then((value) {
-                      if(value['status'] == 'success') {
-                        _userService.fetchCurrentUserData().then((userData) {
-                          if(userData != null) {
-                            userDataViewModel.updateUserData(
-                                userData["Uid"],
-                                userData["cnic"],
-                                userData["currentAddress"],
-                                userData["dateOfBirth"],
-                                userData["email"],
-                                userData["firstName"],
-                                userData["gender"],
-                                userData["lastName"],
-                                userData["permanentAddress"],
-                                userData["phone"],
-                                userData["position"]);
-                            loadingViewModel.setLoading(false);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomeScreen(),
-                              ),
-                            );
-                          }
-                          else {
-                            loadingViewModel.setLoading(false);
-                            Utilities().errorMsg('Error Fetching User Data');
-                          }
-                        });
-                      }
-                      else {
-                        loadingViewModel.setLoading(false);
-                        Utilities().errorMsg(value['error']);
-                      }
-                    });
-                  }
+                  _authService.signInWithOTP(otpViewModel.otpController.text, widget.verificationId).then((value) {
+                    if(value['status'] == 'success') {
+                      _userService.fetchCurrentUserData().then((userData) {
+                        if(userData != null) {
+                          userDataViewModel.updateUserData(
+                              userData["Uid"],
+                              userData["cnic"],
+                              userData["currentAddress"],
+                              userData["dateOfBirth"],
+                              userData["email"] ?? '',
+                              userData["firstName"],
+                              userData["gender"],
+                              userData["lastName"],
+                              userData["permanentAddress"],
+                              userData["phone"],
+                              userData["position"]);
+                          loadingViewModel.setLoading(false);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomeScreen(),
+                            ),
+                          );
+                        }
+                        else {
+                          loadingViewModel.setLoading(false);
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationScreen(uid: value['uid'], phone: widget.phoneNo,)));
+                        }
+                      });
+                    }
+                    else {
+                      loadingViewModel.setLoading(false);
+                      Utilities().errorMsg(value['error']);
+                    }
+                  });
                 }
 
               },

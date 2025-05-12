@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:codex_clock/Utils/Utilities.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/TakePhotoScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,17 +9,20 @@ import 'package:codex_clock/Views/Widgets/CustomButton.dart';
 import 'package:codex_clock/Views/Widgets/CustomLabel.dart';
 import 'package:codex_clock/Views/Widgets/CustomTextField.dart';
 
+import '../../../ViewModels/TakePhoto_ViewModel.dart';
 import 'RegisterScreen_2.dart';
 
 class RegistrationScreen extends StatelessWidget {
-  const RegistrationScreen({super.key});
+  final String uid;
+  final String phone;
+  const RegistrationScreen({super.key, required this.uid, required this.phone});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => RegistrationViewModel(),
-      child: Consumer<RegistrationViewModel>(
-        builder: (context, viewModel, child) {
+      child: Consumer2<RegistrationViewModel, CameraViewModel>(
+        builder: (context, viewModel, cameraViewModel, child) {
           return Scaffold(
             backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
             body: SingleChildScrollView(
@@ -43,13 +49,14 @@ class RegistrationScreen extends StatelessWidget {
                     child: Stack(
                       children: [
                         TextButton(
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => CameraScreen(),
                               ),
                             );
+                            // If you plan to return the selected image from CameraScreen, handle it here
                           },
                           child: Container(
                             width: 130,
@@ -58,18 +65,28 @@ class RegistrationScreen extends StatelessWidget {
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: const Color.fromRGBO(236, 0, 60, 1),
-                                width: 1.5,
+                                width: 2.5,
                               ),
                             ),
-                            child: const Center(
+                            child: cameraViewModel.selectedImage == null
+                                ? const Center(
                               child: Text(
                                 "Upload Photo",
                                 style: TextStyle(color: Colors.grey),
                               ),
+                            )
+                                : ClipOval(
+                              child: Image.file(
+                                cameraViewModel.selectedImage!,
+                                fit: BoxFit.cover,
+                                width: 130,
+                                height: 130,
+                              ),
                             ),
                           ),
                         ),
-                        Positioned(
+
+                        cameraViewModel.selectedImage == null ? Positioned(
                           bottom: 10,
                           right: 25,
                           child: CircleAvatar(
@@ -81,7 +98,7 @@ class RegistrationScreen extends StatelessWidget {
                               size: 18,
                             ),
                           ),
-                        ),
+                        ) : SizedBox(),
                       ],
                     ),
                   ),
@@ -121,34 +138,24 @@ class RegistrationScreen extends StatelessWidget {
                     errorText: viewModel.cnicError,
                   ),
 
-                  const SizedBox(height: 16),
-                  const CustomLabel(text: "Enter Your Email"),
+                  const SizedBox(height: 15),
+                  const CustomLabel(text: "Enter Your Permanent Address"),
                   CustomTextField(
-                    hint: "xyz@example.xxx",
-                    controller: viewModel.emailController,
-                    focusNode: viewModel.emailFocusNode,
-                    errorText: viewModel.emailError,
+                    hint: "Permanent Address",
+                    controller: viewModel.permanentAddressController,
+                    focusNode: viewModel.permanentAddressFocusNode,
+                    errorText: viewModel.permanentError,
                   ),
 
-                  const SizedBox(height: 16),
-                  const CustomLabel(text: "Enter Your Mobile No"),
+                  const SizedBox(height: 15),
+                  const CustomLabel(text: "Enter Your Current Address"),
                   CustomTextField(
-                    hint: "3XXXXXXXXX",
-                    controller: viewModel.mobileController,
-                    focusNode: viewModel.mobileFocusNode,
-                    errorText: viewModel.mobileError,
-                    isPhoneField: true,
+                    hint: "Current Address",
+                    controller: viewModel.currentAddressController,
+                    focusNode: viewModel.currentAddressFocusNode,
+                    errorText: viewModel.currentError,
                   ),
 
-                  const SizedBox(height: 16),
-                  const CustomLabel(text: "Enter Your Password"),
-                  CustomTextField(
-                    hint: "Password",
-                    controller: viewModel.passwordController,
-                    focusNode: viewModel.passwordFocusNode,
-                    obscureText: true,
-                    errorText: viewModel.passwordError,
-                  ),
 
                   const SizedBox(height: 34),
 
@@ -157,18 +164,24 @@ class RegistrationScreen extends StatelessWidget {
                     text: "Next",
                     color: const Color.fromRGBO(236, 0, 60, 1),
                     onPressed: () {
-                      if (viewModel.validateForm()) {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                            Registration2Screen(
-                              firstName: viewModel.firstNameController.text.trim(),
-                              lastName: viewModel.lastNameController.text.trim(),
-                              cnic: viewModel.cnicController.text.trim(),
-                              email: viewModel.emailController.text.trim(),
-                              phoneVerification: "+92${viewModel.mobileController.text.trim()}",
-                              phone: "0${viewModel.mobileController.text.trim()}",
-                              password: viewModel.passwordController.text.trim(),
-                            )
-                        ));
+                      if(cameraViewModel.selectedImage != null) {
+                        if (viewModel.validateForm()) {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                              Registration2Screen(
+                                uid: uid,
+                                firstName: viewModel.firstNameController.text.trim(),
+                                lastName: viewModel.lastNameController.text.trim(),
+                                cnic: viewModel.cnicController.text.trim(),
+                                permanentAddress: viewModel.permanentAddressController.text.trim(),
+                                currentAddress: viewModel.currentAddressController.text.trim(),
+                                phone: phone,
+
+                              )
+                          ));
+                        }
+                      }
+                      else {
+                        Utilities().errorMsg('Please Select an Image');
                       }
                     },
                   ),

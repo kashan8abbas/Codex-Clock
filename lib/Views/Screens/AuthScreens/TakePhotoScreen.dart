@@ -195,11 +195,11 @@ class _CameraScreenState extends State<CameraScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.image, size: 32),
-                      onPressed: () => viewModel.pickFromGallery(),
+                      onPressed: () => viewModel.pickFromGallery(context),
                     ),
                     const SizedBox(width: 40),
                     GestureDetector(
-                      onTap: () => viewModel.capturePhoto(),
+                      onTap: () => viewModel.capturePhoto(context),
                       child: Container(
                         width: 70,
                         height: 70,
@@ -219,28 +219,6 @@ class _CameraScreenState extends State<CameraScreen> {
                 ),
               ),
 
-              // Thumbnails of recent images
-              SizedBox(
-                height: 80,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: viewModel.recentImages.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          viewModel.recentImages[index],
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
             ],
           );
         },
