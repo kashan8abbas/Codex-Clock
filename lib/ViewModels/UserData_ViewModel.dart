@@ -13,6 +13,8 @@ class UserDataViewModel with ChangeNotifier {
   String _permanentAddress = '';
   String _phone = '';
   String _position = '';
+  String _profilePic = '';
+  Timestamp _createdAt = Timestamp(0, 0);
 
   String get uid => _uid;
   String get cnic => _cnic;
@@ -25,6 +27,8 @@ class UserDataViewModel with ChangeNotifier {
   String get permanentAddress => _permanentAddress;
   String get phone => _phone;
   String get position => _position;
+  String get profilePic => _profilePic;
+  Timestamp get createdAt => _createdAt;
 
 
   void updateUserData(
@@ -38,7 +42,9 @@ class UserDataViewModel with ChangeNotifier {
       String lastName,
       String permanentAddress,
       String phone,
-      String position) {
+      String position,
+      String profilePic,
+      Timestamp createdAt) {
     _uid = uid;
     _cnic = cnic;
     _currentAddress = currentAddress;
@@ -50,6 +56,8 @@ class UserDataViewModel with ChangeNotifier {
     _permanentAddress = permanentAddress;
     _phone = phone;
     _position = position;
+    _profilePic = profilePic;
+    _createdAt = createdAt;
     notifyListeners();
   }
 
@@ -67,6 +75,8 @@ class UserDataViewModel with ChangeNotifier {
     _permanentAddress = '';
     _phone = '';
     _position = '';
+    _profilePic = '';
+    _createdAt = Timestamp(0, 0);
     notifyListeners();
   }
 }

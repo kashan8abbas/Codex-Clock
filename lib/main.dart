@@ -1,6 +1,8 @@
 import 'package:codex_clock/ViewModels/Attendence_ViewModel.dart';
+import 'package:codex_clock/ViewModels/CompanyData_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Leave_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
+import 'package:codex_clock/ViewModels/Navigation_ViewModel.dart';
 import 'package:codex_clock/ViewModels/QRCode_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Register2_VIewModel.dart';
 import 'package:codex_clock/ViewModels/TakePhoto_ViewModel.dart';
@@ -36,6 +38,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AttendanceModel()),
         ChangeNotifierProvider(create: (_) => LoadingViewModel()),
         ChangeNotifierProvider(create: (_) => UserDataViewModel()),
+        ChangeNotifierProvider(create: (_) => CompanyDataViewModel()),
+        ChangeNotifierProvider(create: (_) => NavigationViewModel()),
 
       ],
       child: MaterialApp(

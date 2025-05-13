@@ -129,10 +129,17 @@ class Registration2Screen extends StatelessWidget {
 
               const SizedBox(height: 15),
               CustomDropdown(
-                label: "Select Your",
-                items: ["Option 1", "Option 2"],
+                label: "Select Your Designation",
+                items: ["CEO", "COO", "CTO", "HR",
+                  "Flutter Team Lead", "Senior Flutter Developer",
+                  "Junior Flutter Developer", "Shopify Team Lead", "Senior Shopify Developer",
+                  "Junior Shopify Developer", "Wordpress Team Lead", "Senior Wordpress Developer",
+                  "Junior Wordpress Developer", "Graphic Team Lead", "Senior Graphic Designer",
+                  "Junior Graphic Designer", "UI/UX Designer", "Senior UI/UX Designer",
+                  "Junior UI/UX Designer", "AI/ML"],
                 selectedValue: viewModel.selectedCategory,
                 onChanged: viewModel.setCategory,
+                text: Text('Select Designation'),
               ),
 
               const SizedBox(height: 15),
@@ -155,7 +162,8 @@ class Registration2Screen extends StatelessWidget {
                               viewModel.selectedMonth ?? "",
                               viewModel.selectedYear ?? "",
                             );
-                      }
+                      },
+                      text: Text('Day'),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -170,6 +178,7 @@ class Registration2Screen extends StatelessWidget {
                             value!,
                             viewModel.selectedYear ?? "",
                           ),
+                      text: Text('Month'),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -188,7 +197,8 @@ class Registration2Screen extends StatelessWidget {
                               viewModel.selectedMonth ?? "",
                               value!,
                             );
-                      }
+                      },
+                      text: Text('Year'),
                     ),
                   ),
                 ],
@@ -206,56 +216,65 @@ class Registration2Screen extends StatelessWidget {
                 color: Color.fromRGBO(236, 0, 60, 1),
                 text: "Sign Up",
                 onPressed: () {
-                  if (viewModel.validateForm()) {
-                    loadingViewModel.setLoading(true);
-                    _authService.signUpService(
-                      uid: uid,
-                      firstName: firstName,
-                      lastName: lastName,
-                      cnic: cnic,
-                      permanentAddress: permanentAddress,
-                      currentAddress: currentAddress,
-                      dateOfBirth: {
-                        'day': viewModel.selectedDay,
-                        'month': viewModel.selectedMonth,
-                        'year': viewModel.selectedYear
-                      },
-                      gender: viewModel.selectedGender,
-                      phone: phone,
-                      position: viewModel.selectedCategory!
-                    ).then((value) {
-                      _userService.fetchCurrentUserData().then((userData) {
-                        if(userData != null) {
-                          userDataViewModel.updateUserData(
-                              userData["Uid"],
-                              userData["cnic"],
-                              userData["currentAddress"],
-                              userData["dateOfBirth"],
-                              userData["email"] ?? '',
-                              userData["firstName"],
-                              userData["gender"],
-                              userData["lastName"],
-                              userData["permanentAddress"],
-                              userData["phone"],
-                              userData["position"]);
-                          loadingViewModel.setLoading(false);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomeScreen(),
-                            ),
-                          );
-                        }
-                        else{
-                          loadingViewModel.setLoading(false);
-                          Utilities().errorMsg('Error Fetching User Data');
-                        }
+                  if(cameraViewModel.selectedImage != null) {
+                    if (viewModel.validateForm()) {
+                      loadingViewModel.setLoading(true);
+                      _authService.signUpService(
+                          uid: uid,
+                          firstName: firstName,
+                          lastName: lastName,
+                          cnic: cnic,
+                          permanentAddress: permanentAddress,
+                          currentAddress: currentAddress,
+                          dateOfBirth: {
+                            'day': viewModel.selectedDay,
+                            'month': viewModel.selectedMonth,
+                            'year': viewModel.selectedYear
+                          },
+                          gender: viewModel.selectedGender,
+                          phone: phone,
+                          position: viewModel.selectedCategory!,
+                        imageFile: cameraViewModel.selectedImage!
+                      ).then((value) {
+                        _userService.fetchCurrentUserData().then((userData) {
+                          if(userData != null) {
+                            userDataViewModel.updateUserData(
+                                userData["Uid"],
+                                userData["cnic"],
+                                userData["currentAddress"],
+                                userData["dateOfBirth"],
+                                userData["email"] ?? '',
+                                userData["firstName"],
+                                userData["gender"],
+                                userData["lastName"],
+                                userData["permanentAddress"],
+                                userData["phone"],
+                                userData["position"],
+                                userData["profilePic"],
+                                userData["createdAt"]
+                            );
+                            loadingViewModel.setLoading(false);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomeScreen(),
+                              ),
+                            );
+                          }
+                          else{
+                            loadingViewModel.setLoading(false);
+                            Utilities().errorMsg('Error Fetching User Data');
+                          }
+
+                        });
+
 
                       });
 
-
-                    });
-
+                    }
+                  }
+                  else {
+                    Utilities().errorMsg('Please Select an Image');
                   }
                 },
               ),

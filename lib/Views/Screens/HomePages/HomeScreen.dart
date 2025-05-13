@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:codex_clock/Services/app_service.dart';
+import 'package:codex_clock/ViewModels/Navigation_ViewModel.dart';
 import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
+import 'package:codex_clock/Views/Screens/AdditionalScreens/ProfileScreen.dart';
 import 'package:codex_clock/Views/Screens/HomePages/QR_CodeScreen.dart';
 import 'package:codex_clock/Views/Widgets/CustomDrawer.dart';
 import 'package:codex_clock/Views/Widgets/CustomNavbar.dart';
@@ -10,6 +13,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import '../../../ViewModels/CompanyData_ViewModel.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,7 +26,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String currentTime = '';
-  int _selectedIndex = 0;
   int _selectedTabIndex = 0;
   final List<String> _tabs = ["Weekly", "Monthly", "Yearly"];
 
@@ -42,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+
   @override
   void dispose() {
     _timer?.cancel(); // Cancel the timer to prevent memory leaks
@@ -49,11 +54,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    final viewModel = Provider.of<NavigationViewModel>(context, listen: false);
+    viewModel.updateIndex(index);
 
-    if (_selectedIndex == 2) {
+    if (viewModel.currentIndex == 2) {
       _scaffoldKey.currentState?.openEndDrawer();
     }
   }
@@ -61,18 +65,30 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    final companyDataViewModel = Provider.of<CompanyDataViewModel>(context, listen: false);
+    fetchCompanyData(companyDataViewModel);
     updateTime();
+  }
+
+  void fetchCompanyData(CompanyDataViewModel viewModel) async {
+    AppService appService = AppService();
+    await appService.fetchCompanyCode().then((companyData) {
+      if(companyData != null) {
+        viewModel.updateCompanyData(companyData['code']);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final userDataViewModel = Provider.of<UserDataViewModel>(context, listen: true);
+    final navigationViewModel = Provider.of<NavigationViewModel>(context, listen: true);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
       endDrawer: const CustomDrawer(),
       body:
-          _selectedIndex == 0 || _selectedIndex == 2
+      navigationViewModel.currentIndex == 0 || navigationViewModel.currentIndex == 2
               ? Stack(
                 children: [
                   // Scrollable content
@@ -113,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             IconButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, '/profile');
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
                               },
                               icon: SizedBox(
                                 width: 60,
@@ -149,11 +165,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               )
-              : _selectedIndex == 1
+              : navigationViewModel.currentIndex == 1
               ? QRScannerBody()
               : Text("hello world"),
       bottomNavigationBar: CustomBottomNavBar(
-        selectedIndex: _selectedIndex,
+        selectedIndex: navigationViewModel.currentIndex,
         onItemTapped: _onItemTapped,
       ),
     );

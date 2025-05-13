@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:codex_clock/Utils/Utilities.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 
 class AuthService {
 
@@ -90,32 +93,54 @@ class AuthService {
     required String gender,
     required String permanentAddress,
     required String currentAddress,
+    required File imageFile,
   }) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
+
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     try {
 
-
-
-      // Step 3: Store user data in Firestore
-      await firestore.collection("Users").doc(uid).set({
-        'Uid': uid,
-        'firstName': firstName,
-        'lastName': lastName,
-        'cnic': cnic,
-        'phone': phone,
-        'position': position,
-        'dateOfBirth': dateOfBirth,
-        'gender': gender,
-        'permanentAddress': permanentAddress,
-        'currentAddress': currentAddress,
-        'createdAt': FieldValue.serverTimestamp(),
+      await uploadImageToFirebase(imageFile).then((imageUrl) async {
+        await firestore.collection("Users").doc(uid).set({
+          'Uid': uid,
+          'firstName': firstName,
+          'lastName': lastName,
+          'cnic': cnic,
+          'phone': phone,
+          'position': position,
+          'dateOfBirth': dateOfBirth,
+          'gender': gender,
+          'permanentAddress': permanentAddress,
+          'currentAddress': currentAddress,
+          'profilePic': imageUrl,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
       });
+
 
 
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<String?> uploadImageToFirebase(File imageFile) async {
+    try {
+
+
+      final storageRef = FirebaseStorage.instance.ref();
+      final imageRef = storageRef.child("images/${DateTime.now().millisecondsSinceEpoch}.jpg");
+
+      // Upload the image
+      await imageRef.putFile(imageFile);
+
+      // Get the download URL
+      final downloadUrl = await imageRef.getDownloadURL();
+
+      return downloadUrl;
+    } catch (e) {
+      Utilities().errorMsg('Error uploading image, Please try again');
+      return null;
     }
   }
 

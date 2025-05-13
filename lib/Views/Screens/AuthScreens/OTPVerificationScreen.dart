@@ -84,7 +84,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  "Enter the verification code sent to\n+92 ${widget.phoneNo.substring(3)}",
+                  "Enter the verification code sent to\n+92 ${widget.phoneNo}",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 14, color: Colors.black),
                 ),
@@ -132,7 +132,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               userData["lastName"],
                               userData["permanentAddress"],
                               userData["phone"],
-                              userData["position"]);
+                              userData["position"],
+                              userData["profilePic"],
+                              userData["createdAt"]
+                          );
                           loadingViewModel.setLoading(false);
                           Navigator.push(
                             context,

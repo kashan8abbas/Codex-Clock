@@ -1,6 +1,13 @@
+import 'dart:convert';
+
+import 'package:codex_clock/ViewModels/CompanyData_ViewModel.dart';
+import 'package:codex_clock/ViewModels/Navigation_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/TakePhotoScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+
+import '../../Widgets/SuccessDialogBox.dart';
 
 class QRScannerBody extends StatefulWidget {
   const QRScannerBody({Key? key}) : super(key: key);
@@ -102,50 +109,23 @@ class _QRScannerBodyState extends State<QRScannerBody> {
     );
   }
 
-  Widget _cornerDecoration({
-    double? top,
-    double? bottom,
-    double? left,
-    double? right,
-  }) {
-    return Positioned(
-      top: top,
-      bottom: bottom,
-      left: left,
-      right: right,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          border: Border(
-            top:
-                top != null
-                    ? BorderSide(color: Colors.red, width: 4)
-                    : BorderSide.none,
-            left:
-                left != null
-                    ? BorderSide(color: Colors.red, width: 4)
-                    : BorderSide.none,
-            right:
-                right != null
-                    ? BorderSide(color: Colors.red, width: 4)
-                    : BorderSide.none,
-            bottom:
-                bottom != null
-                    ? BorderSide(color: Colors.red, width: 4)
-                    : BorderSide.none,
-          ),
-        ),
-      ),
-    );
-  }
+
 
   void _onQRViewCreated(QRViewController controller) {
+    final viewModel = Provider.of<CompanyDataViewModel>(context, listen: false);
+    final navigationViewModel = Provider.of<NavigationViewModel>(context, listen: false);
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        result = scanData;
-      });
+
+      result = scanData;
+      if(result!.code != null){
+        String? data = result!.code;
+        String decodedData = utf8.decode(base64Decode(data!));
+        if(decodedData == viewModel.code) {
+          navigationViewModel.updateIndex(0);
+          showLottieSuccessPopup(context);
+        }
+      }
     });
   }
 

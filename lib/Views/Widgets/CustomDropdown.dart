@@ -5,6 +5,7 @@ class CustomDropdown extends StatelessWidget {
   final List<String> items;
   final String? selectedValue;
   final Function(String?)? onChanged;
+  final Widget text;
 
   const CustomDropdown({
     super.key,
@@ -12,6 +13,7 @@ class CustomDropdown extends StatelessWidget {
     required this.items,
     this.selectedValue,
     this.onChanged,
+    required this.text
   });
 
   @override
@@ -22,6 +24,7 @@ class CustomDropdown extends StatelessWidget {
         Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 5),
         DropdownButtonFormField<String>(
+          hint: text,
           value:
               (selectedValue != null && items.contains(selectedValue))
                   ? selectedValue
