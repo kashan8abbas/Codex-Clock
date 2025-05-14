@@ -7,13 +7,15 @@ import 'package:codex_clock/ViewModels/QRCode_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Register2_VIewModel.dart';
 import 'package:codex_clock/ViewModels/TakePhoto_ViewModel.dart';
 import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
-import 'package:codex_clock/Views/Screens/AuthScreens/EmailLoginScreen.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/PhoneLoginScreen.dart';
+import 'package:codex_clock/Views/Screens/HomePages/HomeScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'Views/Screens/AuthScreens/RegisterScreen.dart';
+import 'Services/internet_connectivity.dart';
+import 'ViewModels/QRLoadingViewModel.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -24,9 +26,27 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  bool _isFirstTimeUser = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFirstTimeUser = auth.currentUser == null;
+    auth.authStateChanges().listen((user) {
+      setState(() {
+        _isFirstTimeUser = user == null;
+      });
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -40,11 +60,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserDataViewModel()),
         ChangeNotifierProvider(create: (_) => CompanyDataViewModel()),
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
+        ChangeNotifierProvider(create: (_) => QRLoadingViewModel()),
 
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: PhoneLoginScreen(),
+          home: _isFirstTimeUser ? PhoneLoginScreen() : HomeScreen(),
         theme: ThemeData(
           textSelectionTheme: const TextSelectionThemeData(
 

@@ -37,7 +37,7 @@ class CustomBottomNavBar extends StatelessWidget {
                     icon: SvgPicture.asset(
                       "lib/Utils/Icons/home.svg",
                       colorFilter: const ColorFilter.mode(
-                        Colors.red, // Fully red when selected
+                        Color.fromRGBO(236, 0, 60, 1), // Fully red when selected
                         BlendMode.srcIn,
                       ),
                     ),
@@ -52,7 +52,7 @@ class CustomBottomNavBar extends StatelessWidget {
                     icon: Icon(
                       size: 30,
                       Icons.menu_open_outlined,
-                      color: Colors.red,
+                      color: Color.fromRGBO(236, 0, 60, 1),
                     ),
                   ),
                 ],
@@ -66,7 +66,7 @@ class CustomBottomNavBar extends StatelessWidget {
           bottom: 15, // Slightly raised to avoid overlapping
           child: FloatingActionButton(
             onPressed: () => onItemTapped(1),
-            backgroundColor: Colors.red,
+            backgroundColor: Color.fromRGBO(236, 0, 60, 1),
             elevation: 6, // Added shadow for visibility
             shape: const CircleBorder(),
             child: Padding(

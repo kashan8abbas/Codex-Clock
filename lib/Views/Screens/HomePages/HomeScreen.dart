@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:codex_clock/Services/app_service.dart';
+import 'package:codex_clock/Services/user_service.dart';
 import 'package:codex_clock/ViewModels/Navigation_ViewModel.dart';
 import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AdditionalScreens/ProfileScreen.dart';
@@ -14,6 +15,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../Services/internet_connectivity.dart';
 import '../../../ViewModels/CompanyData_ViewModel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -65,16 +67,47 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    ConnectivityHelper.listenToConnectivityChanges(context);
+    final userDataViewModel = Provider.of<UserDataViewModel>(context, listen: false);
+    fetchUserData(userDataViewModel);
     final companyDataViewModel = Provider.of<CompanyDataViewModel>(context, listen: false);
+    UserService().isConnectedToCompanyWiFi();
     fetchCompanyData(companyDataViewModel);
     updateTime();
+  }
+
+  void fetchUserData(UserDataViewModel userDataViewModel) {
+    UserService().fetchCurrentUserData().then((userData) {
+      if(userData != null) {
+        userDataViewModel.updateUserData(
+            userData["Uid"],
+            userData["cnic"],
+            userData["currentAddress"],
+            userData["dateOfBirth"],
+            userData["email"] ?? '',
+            userData["firstName"],
+            userData["gender"],
+            userData["lastName"],
+            userData["permanentAddress"],
+            userData["phone"],
+            userData["position"],
+            userData["profilePic"],
+            userData["createdAt"]
+        );
+      }
+    });
   }
 
   void fetchCompanyData(CompanyDataViewModel viewModel) async {
     AppService appService = AppService();
     await appService.fetchCompanyCode().then((companyData) {
       if(companyData != null) {
-        viewModel.updateCompanyData(companyData['code']);
+        viewModel.updateCompanyCode(companyData['code']);
+      }
+    });
+    await appService.fetchCompanyWiFi().then((companyWiFi) {
+      if(companyWiFi != null) {
+        viewModel.updateCompanyIP(companyWiFi['ip_subnet']);
       }
     });
   }
@@ -265,8 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 2,
                               color:
                                   _selectedTabIndex == index
-                                      ? Colors
-                                          .red // Selected tab background
+                                      ? Color.fromRGBO(236, 0, 60, 1) // Selected tab background
                                       : Colors.transparent,
                             ),
                             color:

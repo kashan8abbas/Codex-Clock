@@ -9,11 +9,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-class PhoneLoginScreen extends StatelessWidget {
+import '../../../Services/internet_connectivity.dart';
 
-  final AuthService _authService = AuthService();
+class PhoneLoginScreen extends StatefulWidget {
+
 
   PhoneLoginScreen({super.key});
+
+  @override
+  State<PhoneLoginScreen> createState() => _PhoneLoginScreenState();
+}
+
+class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
+  final AuthService _authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    ConnectivityHelper.listenToConnectivityChanges(context);
+  }
 
   @override
   Widget build(BuildContext context) {
