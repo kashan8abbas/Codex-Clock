@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 
 class UserService {
+
   Future<Map<String, dynamic>?> fetchCurrentUserData() async {
     try {
       User? currentUser = FirebaseAuth.instance.currentUser;
@@ -43,7 +44,6 @@ class UserService {
     if (user == null) return {"msg": "User not signed in", "status": false};
 
     final now = DateTime.now();
-    final hour = now.hour;
     final userId = user.uid;
     final formattedDate = DateFormat('dd-MM-yyyy').format(now);
 
@@ -56,44 +56,50 @@ class UserService {
     final snapshot = await attendanceDoc.get();
 
     if (!snapshot.exists) {
-      // ✅ Check-In Time Window: 10AM to 1PM
-      if (hour >= 10 && hour <= 13) {
-        await attendanceDoc.set({
-          'checkIn': FieldValue.serverTimestamp(),
-          'status': 'present',
-        });
-        return {
-          "msg": "✅ Check-in successful.",
-          "status": true
-        };
-      } else {
-        return {
-          "msg": "⏰ Check-in allowed only between 10:00 AM and 1:00 PM.",
-          "status": false
-        };
-      }
+      await attendanceDoc.set({
+        'checkIn': FieldValue.serverTimestamp(),
+        'status': 'present',
+      });
+      return {
+        "msg": "Check-in successful.",
+        "status": true
+      };
     } else if (!snapshot.data()!.containsKey('checkOut')) {
-      // ✅ Check-Out Time Window: 4PM to 6PM
-      if (hour >= 10 && hour <= 18) {
-        await attendanceDoc.update({
-          'checkOut': FieldValue.serverTimestamp(),
-        });
-        return {
-          "msg": "✅ Check-out successful.",
-          "status": true
-        };
-      } else {
-        return {
-          "msg": "⏰ Check-out allowed only between 4:00 PM and 6:00 PM.",
-          "status": false
-        };
-      }
+      await attendanceDoc.update({
+        'checkOut': FieldValue.serverTimestamp(),
+      });
+      return {
+        "msg": "Check-out successful.",
+        "status": true
+      };
     } else {
       return {
-        "msg": "✅ You have already checked out today.",
+        "msg": "You have already checked out today.",
         "status": false
       };
     }
   }
+
+  Future<void> applyLeave(String reason, DateTime selectedLeaveDate, String leaveType) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return ;
+
+    final userId = user.uid;
+
+    FirebaseFirestore.instance
+        .collection('Leave')
+        .doc(userId)
+        .collection('records')
+        .add({
+      'appliedAt': Timestamp.now(),
+      'leaveDate': Timestamp.fromDate(selectedLeaveDate),
+      'leaveType': leaveType,
+      'reason': reason,
+      'status': 'pending',
+    });
+
+
+  }
+
 
 }

@@ -24,10 +24,4 @@ class ApplyLeaveViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // void submitLeave() {
-  //   // Handle leave submission logic here
-  //   print("Leave Type: $_selectedLeaveType");
-  //   print("Selected Date: $_selectedDate");
-  //   print("Note: $_note");
-  // }
 }

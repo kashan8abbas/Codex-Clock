@@ -1,8 +1,6 @@
 import 'package:codex_clock/ViewModels/Summary_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AdditionalScreens/AttendenceScreen.dart';
-import 'package:codex_clock/Views/Screens/AuthScreens/PhoneLoginScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -17,226 +15,172 @@ class SummaryScreen extends StatelessWidget {
         backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
         body: Consumer<SummaryViewModel>(
           builder: (context, model, child) {
-            return Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 130,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Toggle Buttons
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(
-                                0.3,
-                              ), // Grey shadow with opacity
-                              spreadRadius: 2, // How much the shadow spreads
-                              blurRadius: 5, // Softness of the shadow
-                              offset: Offset(
-                                0,
-                                3,
-                              ), // Shadow position (horizontal, vertical)
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _toggleButton("Weekly", 0, model),
-                            _toggleButton("Monthly", 1, model),
-                            _toggleButton("Yearly", 2, model),
-                          ],
-                        ),
-                      ),
+            final size = MediaQuery.of(context).size;
 
-                      const SizedBox(height: 16),
-
-                      // Dynamic Summary Card
-                      if (model.selectedTab == 0)
-                        _summaryCard("Weekly Summary", "40:00:00", "35:00:00"),
-                      if (model.selectedTab == 1)
-                        _summaryCard(
-                          "Monthly Summary",
-                          "160:00:00",
-                          "150:00:00",
-                        ),
-                      if (model.selectedTab == 2)
-                        _summaryCard(
-                          "Yearly Summary",
-                          "1920:00:00",
-                          "1850:00:00",
-                        ),
-
-                      const SizedBox(height: 16),
-
-                      // Date Picker and Calendar
-                      Container(
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Date*",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.chevron_left),
-                                      onPressed: model.previousMonth,
-                                    ),
-                                    Text(
-                                      model.selectedMonth,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.chevron_right),
-                                      onPressed: model.nextMonth,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20.0),
-                          child: Expanded(
-                            child: TableCalendar(
-                              firstDay: DateTime(2020, 1, 1),
-                              lastDay: DateTime(2030, 12, 31),
-                              focusedDay: model.focusedDay,
-                              calendarFormat: CalendarFormat.month,
-                              headerVisible: false,
-                              rowHeight: 60, // ✅ Set height
-                              selectedDayPredicate:
-                                  (day) => false, // ✅ Disable selection
-                              calendarBuilders: CalendarBuilders(
-                                defaultBuilder: (context, day, focusedDay) {
-                                  final String formattedDay =
-                                      day.day < 10
-                                          ? "0${day.day}"
-                                          : "${day.day}";
-
-                                  // ✅ Current Day (Always Blue)
-                                  if (isSameDay(day, DateTime.now())) {
-                                    return _calendarDayWidget(
-                                      formattedDay,
-                                      Colors.blue,
-                                      () => _onDateSelected(context, day),
-                                    );
-                                  }
-
-                                  // ✅ Past Days (Green and Red Condition)
-                                  if (day.isBefore(DateTime.now())) {
-                                    return model.isPresent(day)
-                                        ? _calendarDayWidget(
-                                          formattedDay,
-                                          const Color.fromRGBO(0, 239, 64, 1),
-                                          () => _onDateSelected(context, day),
-                                        )
-                                        : _calendarDayWidget(
-                                          formattedDay,
-                                          const Color.fromRGBO(236, 0, 60, 1),
-                                          () => _onDateSelected(context, day),
-                                        );
-                                  }
-
-                                  // ✅ Future Days (Normal Black Text)
-                                  return GestureDetector(
-                                    onTap: () => _onDateSelected(context, day),
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        formattedDay,
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Fixed Top Bar
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    width: double.infinity,
-                    height: 100,
-                    color: Color.fromRGBO(
-                      246,
-                      245,
-                      248,
-                      1,
-                    ), // Add background color to prevent transparency issues
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 30),
+            return SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20, left: 5),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(Icons.arrow_back_ios_new_sharp),
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.arrow_back_ios_new_sharp),
                           ),
-
                           const Spacer(),
-
                           const Text(
                             "Summary",
                             style: TextStyle(
                               fontSize: 25,
                               fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 0, 0, 0),
+                              color: Colors.black,
                             ),
                           ),
-
                           const Spacer(),
-
-                          const SizedBox(width: 60), // Keeps spacing balanced
+                          const SizedBox(width: 60),
                         ],
                       ),
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Toggle Buttons
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.3),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                _toggleButton("Weekly", 0, model),
+                                _toggleButton("Monthly", 1, model),
+                                _toggleButton("Yearly", 2, model),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Summary Card
+                          if (model.selectedTab == 0)
+                            _summaryCard("Weekly Summary", "40:00:00", "35:00:00"),
+                          if (model.selectedTab == 1)
+                            _summaryCard("Monthly Summary", "160:00:00", "150:00:00"),
+                          if (model.selectedTab == 2)
+                            _summaryCard("Yearly Summary", "1920:00:00", "1850:00:00"),
+
+                          const SizedBox(height: 10),
+
+                          // Date Label and Month Navigator
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Date*",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromRGBO(236, 0, 60, 1),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.chevron_left),
+                                    onPressed: model.previousMonth,
+                                  ),
+                                  Text(
+                                    model.selectedMonth,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.chevron_right),
+                                    onPressed: model.nextMonth,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // Calendar
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 20.0),
+                              child: TableCalendar(
+                                firstDay: DateTime(2020, 1, 1),
+                                lastDay: DateTime(2030, 12, 31),
+                                focusedDay: model.focusedDay,
+                                calendarFormat: CalendarFormat.month,
+                                headerVisible: false,
+                                rowHeight: size.height * 0.08,
+                                selectedDayPredicate: (day) => false,
+                                calendarBuilders: CalendarBuilders(
+                                  defaultBuilder: (context, day, focusedDay) {
+                                    final String formattedDay = day.day < 10 ? "0${day.day}" : "${day.day}";
+
+                                    if (isSameDay(day, DateTime.now())) {
+                                      return _calendarDayWidget(
+                                        formattedDay,
+                                        Colors.blue,
+                                            () => _onDateSelected(context, day),
+                                      );
+                                    }
+
+                                    if (day.isBefore(DateTime.now())) {
+                                      return model.isPresent(day)
+                                          ? _calendarDayWidget(
+                                        formattedDay,
+                                        const Color.fromRGBO(0, 239, 64, 1),
+                                            () => _onDateSelected(context, day),
+                                      )
+                                          : _calendarDayWidget(
+                                        formattedDay,
+                                        const Color.fromRGBO(236, 0, 60, 1),
+                                            () => _onDateSelected(context, day),
+                                      );
+                                    }
+
+                                    return GestureDetector(
+                                      onTap: () => _onDateSelected(context, day),
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          formattedDay,
+                                          style: const TextStyle(color: Colors.black),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             );
           },
         ),
@@ -284,7 +228,7 @@ class SummaryScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 13),
           decoration: BoxDecoration(
-            color: model.selectedTab == index ? Colors.red : Colors.white,
+            color: model.selectedTab == index ? const Color.fromRGBO(236, 0, 60, 1) : Colors.white,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(

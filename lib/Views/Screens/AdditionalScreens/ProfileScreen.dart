@@ -134,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 10),
 
             const CustomLabel(text: "Since"),
-            _customContainer(Text("${userDataViewModel.createdAt.toDate().day} - $month - ${userDataViewModel.createdAt.toDate().year} ", style: TextStyle(fontWeight: FontWeight.bold),)),
+            _customContainer(Text("${userDataViewModel.createdAt.toDate().day} - $month - ${userDataViewModel.createdAt.toDate().year}", style: TextStyle(fontWeight: FontWeight.bold),)),
           ],
         ),
       ),

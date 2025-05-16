@@ -25,7 +25,7 @@ void showLottieSuccessPopup(BuildContext context, String msg, bool status) {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.green,
+                color: Color.fromRGBO(236, 0, 60, 1),
               ),
             ),
           ],
