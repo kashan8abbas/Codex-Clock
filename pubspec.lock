@@ -659,7 +659,7 @@ packages:
   qr_code_scanner:
     dependency: "direct main"
     description:
-      path: "C:\\Users\\Hp\\Documents\\GitHub\\qr_code_scanner"
+      path: "/Users/mac/Downloads/qr_code_scanner"
       relative: false
     source: path
     version: "1.0.0"

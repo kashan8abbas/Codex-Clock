@@ -5,6 +5,7 @@ import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Navigation_ViewModel.dart';
 import 'package:codex_clock/ViewModels/QRCode_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Register2_VIewModel.dart';
+import 'package:codex_clock/ViewModels/Summary_ViewModel.dart';
 import 'package:codex_clock/ViewModels/TakePhoto_ViewModel.dart';
 import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/PhoneLoginScreen.dart';
@@ -14,7 +15,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'Services/internet_connectivity.dart';
 import 'ViewModels/QRLoadingViewModel.dart';
 import 'firebase_options.dart';
 
@@ -61,6 +61,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => CompanyDataViewModel()),
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
         ChangeNotifierProvider(create: (_) => QRLoadingViewModel()),
+        ChangeNotifierProvider(create: (_) => SummaryViewModel()),
 
       ],
       child: MaterialApp(

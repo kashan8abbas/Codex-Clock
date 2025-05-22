@@ -217,19 +217,6 @@ class AttendanceScreen extends StatelessWidget {
                       },
                     ),
                   ),
-                  // Weekend Off Section
-                  Container(
-                    color: Colors.pink.shade100,
-                    padding: const EdgeInsets.all(12),
-                    child: const Text(
-                      'Weekend Off  25 Saturday 26 Sunday',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                  // Fixed Top Bar
-
                 ],
               ),
             );

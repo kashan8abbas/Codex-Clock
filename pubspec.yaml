@@ -42,7 +42,7 @@ dependencies:
   fl_chart: ^0.68.0
   intl: ^0.20.2
   qr_code_scanner:
-    path: C:\Users\Hp\Documents\GitHub\qr_code_scanner
+    path: /Users/mac/Downloads/qr_code_scanner
   url_launcher: ^6.3.1
   table_calendar: ^3.2.0
   #mobile_scanner: ^6.0.

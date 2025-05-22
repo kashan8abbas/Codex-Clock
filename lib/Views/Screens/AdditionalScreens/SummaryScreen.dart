@@ -1,6 +1,7 @@
 import 'package:codex_clock/ViewModels/Summary_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AdditionalScreens/AttendenceScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -9,46 +10,45 @@ class SummaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => SummaryViewModel(),
-      child: Scaffold(
-        backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
-        body: Consumer<SummaryViewModel>(
-          builder: (context, model, child) {
-            final size = MediaQuery.of(context).size;
-
-            return SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
+    final size = MediaQuery.of(context).size;
+    return Scaffold(
+      backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 20, left: 5),
+                child: Row(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20, left: 5),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(Icons.arrow_back_ios_new_sharp),
-                          ),
-                          const Spacer(),
-                          const Text(
-                            "Summary",
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          const Spacer(),
-                          const SizedBox(width: 60),
-                        ],
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.arrow_back_ios_new_sharp),
+                    ),
+                    const Spacer(),
+                    const Text(
+                      "Summary",
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    const Spacer(),
+                    const SizedBox(width: 60),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Toggle Buttons
+                    Consumer<SummaryViewModel>(
+                        builder: (context, model, child) {
+                      return Column(
                         children: [
-                          // Toggle Buttons
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
@@ -76,115 +76,122 @@ class SummaryScreen extends StatelessWidget {
 
                           // Summary Card
                           if (model.selectedTab == 0)
-                            _summaryCard("Weekly Summary", "40:00:00", "35:00:00"),
+                            _summaryCard("Weekly Summary", "40:00", model.formatDuration(model.getWeeklyWorkedHours(DateTime.now()))),
                           if (model.selectedTab == 1)
-                            _summaryCard("Monthly Summary", "160:00:00", "150:00:00"),
+                            _summaryCard("Monthly Summary", "160:00", model.formatDuration(model.getMonthlyWorkedHours(DateTime.now()))),
                           if (model.selectedTab == 2)
-                            _summaryCard("Yearly Summary", "1920:00:00", "1850:00:00"),
+                            _summaryCard("Yearly Summary", "1920:00", model.formatDuration(model.getYearlyWorkedHours(DateTime.now()))),
+                        ],
+                      );
+                      }
+                    ),
 
-                          const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-                          // Date Label and Month Navigator
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Date*",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(236, 0, 60, 1),
+                    // Date Label and Month Navigator
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Date*",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(236, 0, 60, 1),
+                          ),
+                        ),
+                        Consumer<SummaryViewModel>(builder: (context, model, child) {
+                          return Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.chevron_left),
+                                  onPressed: model.previousMonth,
                                 ),
-                              ),
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.chevron_left),
-                                    onPressed: model.previousMonth,
+                                Text(
+                                  DateFormat.yMMMM().format(model.focusedDay),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  Text(
-                                    model.selectedMonth,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.chevron_right),
+                                  onPressed: model.nextMonth,
+                                ),
+                              ],
+                            );
+                        })
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // Calendar
+                    Consumer<SummaryViewModel>(builder: (context, model, child) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          child: TableCalendar(
+
+                            firstDay: DateTime(2025, 1, 1),
+                            lastDay: DateTime(2030, 12, 31),
+                            focusedDay: model.focusedDay,
+                            calendarFormat: CalendarFormat.month,
+                            headerVisible: false,
+                            rowHeight: size.height * 0.08,
+                            selectedDayPredicate: (day) => false,
+
+                            calendarBuilders: CalendarBuilders(
+                              defaultBuilder: (context, day, focusedDay) {
+                                final String formattedDay = day.day < 10 ? "0${day.day}" : "${day.day}";
+
+                                if (isSameDay(day, DateTime.now())) {
+                                  return _calendarDayWidget(
+                                    formattedDay,
+                                    Colors.blue,
+                                        () => _onDateSelected(context, day),
+                                  );
+                                }
+
+                                if (day.isBefore(DateTime.now())) {
+                                  return model.attendanceRecords.containsKey(DateFormat('dd-MM-yyyy').format(day))
+                                      ? _calendarDayWidget(
+                                    formattedDay,
+                                    const Color.fromRGBO(0, 239, 64, 1), // Green = Present
+                                        () => _onDateSelected(context, day),
+                                  )
+                                      : _calendarDayWidget(
+                                    formattedDay,
+                                    const Color.fromRGBO(236, 0, 60, 1), // Red = Absent
+                                        () => _onDateSelected(context, day),
+                                  );
+                                }
+
+                                return GestureDetector(
+                                  onTap: () => _onDateSelected(context, day),
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      formattedDay,
+                                      style: const TextStyle(color: Colors.black),
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.chevron_right),
-                                    onPressed: model.nextMonth,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          // Calendar
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 20.0),
-                              child: TableCalendar(
-                                firstDay: DateTime(2020, 1, 1),
-                                lastDay: DateTime(2030, 12, 31),
-                                focusedDay: model.focusedDay,
-                                calendarFormat: CalendarFormat.month,
-                                headerVisible: false,
-                                rowHeight: size.height * 0.08,
-                                selectedDayPredicate: (day) => false,
-                                calendarBuilders: CalendarBuilders(
-                                  defaultBuilder: (context, day, focusedDay) {
-                                    final String formattedDay = day.day < 10 ? "0${day.day}" : "${day.day}";
-
-                                    if (isSameDay(day, DateTime.now())) {
-                                      return _calendarDayWidget(
-                                        formattedDay,
-                                        Colors.blue,
-                                            () => _onDateSelected(context, day),
-                                      );
-                                    }
-
-                                    if (day.isBefore(DateTime.now())) {
-                                      return model.isPresent(day)
-                                          ? _calendarDayWidget(
-                                        formattedDay,
-                                        const Color.fromRGBO(0, 239, 64, 1),
-                                            () => _onDateSelected(context, day),
-                                      )
-                                          : _calendarDayWidget(
-                                        formattedDay,
-                                        const Color.fromRGBO(236, 0, 60, 1),
-                                            () => _onDateSelected(context, day),
-                                      );
-                                    }
-
-                                    return GestureDetector(
-                                      onTap: () => _onDateSelected(context, day),
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          formattedDay,
-                                          style: const TextStyle(color: Colors.black),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
+                                );
+                              },
                             ),
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    })
                   ],
                 ),
               ),
-            );
-          },
+            ],
+          ),
         ),
-      ),
+      )
     );
   }
 
@@ -267,15 +274,13 @@ class SummaryScreen extends StatelessWidget {
 
   Widget _calendarDayWidget(String dayText, Color color, VoidCallback onTap) {
     return GestureDetector(
-      onTap: onTap, // ✅ Handle date click
+      onTap: onTap,
       child: Container(
         alignment: Alignment.center,
-        margin: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        margin: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: color,
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(8),
+          shape: BoxShape.circle,
         ),
         child: Text(
           dayText,
@@ -287,4 +292,5 @@ class SummaryScreen extends StatelessWidget {
       ),
     );
   }
+
 }

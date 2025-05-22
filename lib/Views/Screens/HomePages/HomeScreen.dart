@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:codex_clock/Services/app_service.dart';
 import 'package:codex_clock/Services/user_service.dart';
 import 'package:codex_clock/ViewModels/Navigation_ViewModel.dart';
+import 'package:codex_clock/ViewModels/Summary_ViewModel.dart';
 import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AdditionalScreens/ProfileScreen.dart';
 import 'package:codex_clock/Views/Screens/HomePages/QR_CodeScreen.dart';
@@ -33,10 +34,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Different data for each tab
   final Map<int, List<double>> _chartData = {
-    0: [150, 180, 230, 100, 150, 100, 120], // Weekly
-    1: [200, 220, 250, 190, 210, 180, 160], // Monthly
-    2: [300, 280, 310, 270, 290, 260, 250], // Yearly
+    0: [7, 8, 6, 8, 9],
+    1: [35, 42, 37, 40],
+    2: [155, 159, 157, 162, 160, 152, 155, 159, 157, 162, 160, 152],
   };
+
+  late Map<int, List<double>> fetchData;
 
   Timer? _timer;
 
@@ -71,6 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final userDataViewModel = Provider.of<UserDataViewModel>(context, listen: false);
     fetchUserData(userDataViewModel);
     final companyDataViewModel = Provider.of<CompanyDataViewModel>(context, listen: false);
+    final summaryViewModel = Provider.of<SummaryViewModel>(context, listen: false);
+    fetchChartData(summaryViewModel);
     UserService().isConnectedToCompanyWiFi();
     fetchCompanyData(companyDataViewModel);
     updateTime();
@@ -110,6 +115,14 @@ class _HomeScreenState extends State<HomeScreen> {
         viewModel.updateCompanyIP(companyWiFi['ip_subnet']);
       }
     });
+  }
+
+  void fetchChartData(SummaryViewModel model) {
+    List<double> weeks = model.getDailyWorkedHours(DateTime.now());
+    fetchData = {
+      0: weeks
+    };
+    print(fetchData);
   }
 
   @override
@@ -256,6 +269,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildChartSection() {
+    final model = Provider.of<SummaryViewModel>(context, listen: false);
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       color: Colors.white,
@@ -337,7 +351,8 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 30),
 
             // Bar Chart
-            SizedBox(
+            _selectedTabIndex == 0
+                ?  SizedBox(
               height: 200,
               child: BarChart(
                 BarChartData(
@@ -381,8 +396,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             "Wed",
                             "Thu",
                             "Fri",
-                            "Sat",
-                            "Sun",
                           ];
                           return value.toInt() >= 0 &&
                                   value.toInt() < days.length
@@ -396,8 +409,149 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   barGroups: List.generate(
-                    7,
+                    5,
                     (index) => _buildBarGroup(
+                      index,
+                      _chartData[_selectedTabIndex]![index],
+                      index % 2 == 0 ? Colors.red : Colors.pink.shade300,
+                    ),
+                  ),
+                ),
+              ),
+            )
+                : _selectedTabIndex == 1
+                ? SizedBox(
+              height: 200,
+              child: BarChart(
+                BarChartData(
+                  gridData: FlGridData(
+                    show: true,
+                    drawHorizontalLine: true,
+                    drawVerticalLine: false,
+                    getDrawingHorizontalLine:
+                        (value) => FlLine(color: Colors.grey, strokeWidth: 1.2),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 30,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            value.toInt().toString(),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          List<String> days = [
+                            "First",
+                            "Second",
+                            "Third",
+                            "Fourth",
+                          ];
+                          return value.toInt() >= 0 &&
+                              value.toInt() < days.length
+                              ? Text(
+                            days[value.toInt()],
+                            style: const TextStyle(fontSize: 12),
+                          )
+                              : Container();
+                        },
+                      ),
+                    ),
+                  ),
+                  barGroups: List.generate(
+                    4,
+                        (index) => _buildBarGroup(
+                      index,
+                      _chartData[_selectedTabIndex]![index],
+                      index % 2 == 0 ? Colors.red : Colors.pink.shade300,
+                    ),
+                  ),
+                ),
+              ),
+            )
+                : SizedBox(
+              height: 200,
+              child: BarChart(
+                BarChartData(
+                  gridData: FlGridData(
+                    show: true,
+                    drawHorizontalLine: true,
+                    drawVerticalLine: false,
+                    getDrawingHorizontalLine:
+                        (value) => FlLine(color: Colors.grey, strokeWidth: 1.2),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        // reservedSize: 30,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            value.toInt().toString(),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          List<String> days = [
+                            "Jan",
+                            "Feb",
+                            "Mar",
+                            "Apr",
+                            "May",
+                            "Jun",
+                            "Jul",
+                            "Aug",
+                            "Sep",
+                            "Oct",
+                            "Nov",
+                            "Dec",
+                          ];
+                          return value.toInt() >= 0 &&
+                              value.toInt() < days.length
+                              ? Text(
+                            days[value.toInt()],
+                            style: const TextStyle(fontSize: 9),
+                          )
+                              : Container();
+                        },
+                      ),
+                    ),
+                  ),
+                  barGroups: List.generate(
+                    12,
+                        (index) => _buildBarGroup(
                       index,
                       _chartData[_selectedTabIndex]![index],
                       index % 2 == 0 ? Colors.red : Colors.pink.shade300,
@@ -416,10 +570,17 @@ class _HomeScreenState extends State<HomeScreen> {
     return BarChartGroupData(
       x: x,
       barRods: [
-        BarChartRodData(
+        _selectedTabIndex != 2 ? BarChartRodData(
+
           toY: y,
           color: color,
           width: 30,
+          borderRadius: BorderRadius.circular(5),
+        ) : BarChartRodData(
+
+          toY: y,
+          color: color,
+          width: 17,
           borderRadius: BorderRadius.circular(5),
         ),
       ],
