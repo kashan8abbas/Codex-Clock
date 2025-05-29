@@ -1,10 +1,11 @@
+import 'package:codex_clock/Models/Attendance_Moldel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class AttendanceCard extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final AttendanceModel data;
 
-  const AttendanceCard({Key? key, required this.data}) : super(key: key);
+  const AttendanceCard({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -38,14 +39,14 @@ class AttendanceCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    data['date'].split(' ')[0],
+                    data.date.split(' ')[0],
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    data['date'].split(' ')[1],
+                    data.date.split(' ')[1],
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -59,7 +60,7 @@ class AttendanceCard extends StatelessWidget {
           // Time Section
           Expanded(
             flex: 8,
-            child: Container(
+            child: SizedBox(
               height: 65,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,7 +70,7 @@ class AttendanceCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SvgPicture.asset('lib/Utils/Icons/checkin.svg'),
-                      _timeRow('Check in', data['checkIn']),
+                      _timeRow('Check in', data.checkIn),
                       Text("Check In"),
                     ],
                   ),
@@ -77,7 +78,7 @@ class AttendanceCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SvgPicture.asset('lib/Utils/Icons/checkout.svg'),
-                      _timeRow('Check out', data['checkOut']),
+                      _timeRow('Check out', data.checkOut),
                       Text("Check Out"),
                     ],
                   ),
@@ -85,7 +86,7 @@ class AttendanceCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SvgPicture.asset('lib/Utils/Icons/totalhours.svg'),
-                      _timeRow('Total Hrs', data['hours']),
+                      _timeRow('Total Hrs', data.hours),
                       Text("Total Hrs"),
                     ],
                   ),
@@ -97,20 +98,24 @@ class AttendanceCard extends StatelessWidget {
           // Status Section
           Expanded(
             flex: 3,
-            child: Container(
+            child: SizedBox(
               height: 65,
 
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    data['status'],
+                    data.status,
                     style: TextStyle(
-                      color: data['statusColor'],
+                      color: data.status == 'Full Day'
+                            ? Colors.green
+                            : data.status == 'Absent'
+                            ? Colors.red
+                            : Colors.orange,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  _statusTag(data['type']),
+                  _statusTag('Regular'),
                 ],
               ),
             ),

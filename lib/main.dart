@@ -1,5 +1,6 @@
 import 'package:codex_clock/ViewModels/Attendence_ViewModel.dart';
 import 'package:codex_clock/ViewModels/CompanyData_ViewModel.dart';
+import 'package:codex_clock/ViewModels/Home_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Leave_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Navigation_ViewModel.dart';
@@ -10,6 +11,7 @@ import 'package:codex_clock/ViewModels/TakePhoto_ViewModel.dart';
 import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/PhoneLoginScreen.dart';
 import 'package:codex_clock/Views/Screens/HomePages/HomeScreen.dart';
+import 'package:codex_clock/test.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -55,13 +57,15 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => SignUpViewModel()),
         ChangeNotifierProvider(create: (_) => QRScannerViewModel()),
         ChangeNotifierProvider(create: (_) => ApplyLeaveViewModel()),
-        ChangeNotifierProvider(create: (_) => AttendanceModel()),
+        ChangeNotifierProvider(create: (_) => AttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => LoadingViewModel()),
         ChangeNotifierProvider(create: (_) => UserDataViewModel()),
         ChangeNotifierProvider(create: (_) => CompanyDataViewModel()),
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
         ChangeNotifierProvider(create: (_) => QRLoadingViewModel()),
         ChangeNotifierProvider(create: (_) => SummaryViewModel()),
+        ChangeNotifierProvider(create: (_) => HomeViewmodel()),
+        ChangeNotifierProvider(create: (_) => AttendanceViewModel()),
 
       ],
       child: MaterialApp(

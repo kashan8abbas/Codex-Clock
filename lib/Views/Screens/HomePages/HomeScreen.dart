@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:codex_clock/Services/app_service.dart';
 import 'package:codex_clock/Services/user_service.dart';
+import 'package:codex_clock/ViewModels/Home_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Navigation_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Summary_ViewModel.dart';
 import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
@@ -11,6 +12,7 @@ import 'package:codex_clock/Views/Widgets/CustomDrawer.dart';
 import 'package:codex_clock/Views/Widgets/CustomNavbar.dart';
 import 'package:codex_clock/Views/Widgets/CustomTimeCard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -32,14 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedTabIndex = 0;
   final List<String> _tabs = ["Weekly", "Monthly", "Yearly"];
 
-  // Different data for each tab
-  final Map<int, List<double>> _chartData = {
-    0: [7, 8, 6, 8, 9],
-    1: [35, 42, 37, 40],
-    2: [155, 159, 157, 162, 160, 152, 155, 159, 157, 162, 160, 152],
-  };
-
-  late Map<int, List<double>> fetchData;
 
   Timer? _timer;
 
@@ -75,7 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchUserData(userDataViewModel);
     final companyDataViewModel = Provider.of<CompanyDataViewModel>(context, listen: false);
     final summaryViewModel = Provider.of<SummaryViewModel>(context, listen: false);
-    fetchChartData(summaryViewModel);
+    final homeViewmodel = Provider.of<HomeViewmodel>(context, listen: false);
+    fetchChartData(summaryViewModel, homeViewmodel);
     UserService().isConnectedToCompanyWiFi();
     fetchCompanyData(companyDataViewModel);
     updateTime();
@@ -117,12 +112,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void fetchChartData(SummaryViewModel model) {
-    List<double> weeks = model.getDailyWorkedHours(DateTime.now());
-    fetchData = {
-      0: weeks
-    };
-    print(fetchData);
+  void fetchChartData(SummaryViewModel model, HomeViewmodel homeViewmodel) async {
+    await UserService().loadAttendanceRecords(model).then((_) {
+      List<double> days = model.getDailyWorkedHours(DateTime.now());
+      homeViewmodel.setFetchDataDaily(days);
+      List<double> weeks = model.getWeeklyWorkedHoursTotalsForMonth(DateTime.now().year, DateTime.now().month);
+      homeViewmodel.setFetchDataWeek(weeks);
+      List<double> year = model.getMonthlyWorkedHoursTotalsForYear(DateTime.now().year);
+      homeViewmodel.setFetchDataYear(year);
+    });
   }
 
   @override
@@ -269,7 +267,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildChartSection() {
-    final model = Provider.of<SummaryViewModel>(context, listen: false);
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       color: Colors.white,
@@ -277,67 +274,69 @@ class _HomeScreenState extends State<HomeScreen> {
       shadowColor: Colors.black.withOpacity(0.5),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Styled Radio Buttons as Tabs
-            Container(
-              height: 60,
-              decoration: BoxDecoration(
-                color: const Color.fromRGBO(
-                  246,
-                  245,
-                  248,
-                  1,
-                ), // Background color
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Row(
-                  children: List.generate(
-                    _tabs.length,
-                    (index) => Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedTabIndex = index;
-                          });
-                        },
-                        child: Container(
-                          height: 35,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 2,
+        child: Consumer<HomeViewmodel>(builder: (context, model, child) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Styled Radio Buttons as Tabs
+              Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(
+                    246,
+                    245,
+                    248,
+                    1,
+                  ), // Background color
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    children: List.generate(
+                      _tabs.length,
+                          (index) => Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedTabIndex = index;
+                            });
+                          },
+                          child: Container(
+                            height: 35,
+                            width: 50,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                width: 2,
+                                color:
+                                _selectedTabIndex == index
+                                    ? Color.fromRGBO(236, 0, 60, 1) // Selected tab background
+                                    : Colors.transparent,
+                              ),
                               color:
-                                  _selectedTabIndex == index
-                                      ? Color.fromRGBO(236, 0, 60, 1) // Selected tab background
-                                      : Colors.transparent,
+                              _selectedTabIndex == index
+                                  ? Colors
+                                  .white // Selected tab background
+                                  : Colors
+                                  .transparent, // Unselected tab background
+                              borderRadius: BorderRadius.circular(
+                                10,
+                              ), // Smooth edges
                             ),
-                            color:
+                            alignment: Alignment.center,
+                            child: Text(
+                              _tabs[index],
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color:
                                 _selectedTabIndex == index
                                     ? Colors
-                                        .white // Selected tab background
-                                    : Colors
-                                        .transparent, // Unselected tab background
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ), // Smooth edges
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            _tabs[index],
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  _selectedTabIndex == index
-                                      ? Colors
-                                          .black // Dark text for selected
-                                      : Colors.black.withOpacity(
-                                        0.5,
-                                      ), // Faded text for unselected
+                                    .black // Dark text for selected
+                                    : Colors.black.withOpacity(
+                                  0.5,
+                                ), // Faded text for unselected
+                              ),
                             ),
                           ),
                         ),
@@ -346,222 +345,237 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-            // Bar Chart
-            _selectedTabIndex == 0
-                ?  SizedBox(
-              height: 200,
-              child: BarChart(
-                BarChartData(
-                  gridData: FlGridData(
-                    show: true,
-                    drawHorizontalLine: true,
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine:
-                        (value) => FlLine(color: Colors.grey, strokeWidth: 1.2),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 30,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            value.toInt().toString(),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                          );
-                        },
+              // Bar Chart
+              _selectedTabIndex == 0
+                  ?  model.fetchDataDaily.isNotEmpty ? SizedBox(
+                height: 200,
+                child: BarChart(
+                  BarChartData(
+                    gridData: FlGridData(
+                      show: true,
+                      drawHorizontalLine: true,
+                      drawVerticalLine: false,
+                      getDrawingHorizontalLine:
+                          (value) => FlLine(color: Colors.grey, strokeWidth: 1.2),
+                    ),
+                    borderData: FlBorderData(show: false),
+                    titlesData: FlTitlesData(
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 30,
+                          getTitlesWidget: (value, meta) {
+                            return Text(
+                              value.toInt().toString(),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            List<String> days = [
+                              "Mon",
+                              "Tue",
+                              "Wed",
+                              "Thu",
+                              "Fri",
+                            ];
+                            return value.toInt() >= 0 &&
+                                value.toInt() < days.length
+                                ? Text(
+                              days[value.toInt()],
+                              style: const TextStyle(fontSize: 12),
+                            )
+                                : Container();
+                          },
+                        ),
                       ),
                     ),
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          List<String> days = [
-                            "Mon",
-                            "Tue",
-                            "Wed",
-                            "Thu",
-                            "Fri",
-                          ];
-                          return value.toInt() >= 0 &&
-                                  value.toInt() < days.length
-                              ? Text(
-                                days[value.toInt()],
-                                style: const TextStyle(fontSize: 12),
-                              )
-                              : Container();
-                        },
+                    barGroups: List.generate(
+                      5,
+                          (index) => _buildBarGroup(
+                        index,
+                        model.fetchDataDaily[_selectedTabIndex]![index],
+                        index % 2 == 0 ? Colors.red : Colors.pink.shade300,
                       ),
-                    ),
-                  ),
-                  barGroups: List.generate(
-                    5,
-                    (index) => _buildBarGroup(
-                      index,
-                      _chartData[_selectedTabIndex]![index],
-                      index % 2 == 0 ? Colors.red : Colors.pink.shade300,
                     ),
                   ),
                 ),
-              ),
-            )
-                : _selectedTabIndex == 1
-                ? SizedBox(
-              height: 200,
-              child: BarChart(
-                BarChartData(
-                  gridData: FlGridData(
-                    show: true,
-                    drawHorizontalLine: true,
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine:
-                        (value) => FlLine(color: Colors.grey, strokeWidth: 1.2),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 30,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            value.toInt().toString(),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                          );
-                        },
+              ) : SizedBox(
+                height: 200,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 30),
+                    child: const SpinKitCircle(color: Color.fromRGBO(236, 0, 60, 1),size: 50),
+                  ))
+                  : _selectedTabIndex == 1
+                  ? model.fetchDataWeek.isNotEmpty ? SizedBox(
+                height: 200,
+                child: BarChart(
+                  BarChartData(
+                    gridData: FlGridData(
+                      show: true,
+                      drawHorizontalLine: true,
+                      drawVerticalLine: false,
+                      getDrawingHorizontalLine:
+                          (value) => FlLine(color: Colors.grey, strokeWidth: 1.2),
+                    ),
+                    borderData: FlBorderData(show: false),
+                    titlesData: FlTitlesData(
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 30,
+                          getTitlesWidget: (value, meta) {
+                            return Text(
+                              value.toInt().toString(),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            List<String> days = [
+                              "First",
+                              "Second",
+                              "Third",
+                              "Fourth",
+                            ];
+                            return value.toInt() >= 0 &&
+                                value.toInt() < days.length
+                                ? Text(
+                              days[value.toInt()],
+                              style: const TextStyle(fontSize: 12),
+                            )
+                                : Container();
+                          },
+                        ),
                       ),
                     ),
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          List<String> days = [
-                            "First",
-                            "Second",
-                            "Third",
-                            "Fourth",
-                          ];
-                          return value.toInt() >= 0 &&
-                              value.toInt() < days.length
-                              ? Text(
-                            days[value.toInt()],
-                            style: const TextStyle(fontSize: 12),
-                          )
-                              : Container();
-                        },
+                    barGroups: List.generate(
+                      4,
+                          (index) => _buildBarGroup(
+                        index,
+                        model.fetchDataWeek[_selectedTabIndex]![index],
+                        index % 2 == 0 ? Colors.red : Colors.pink.shade300,
                       ),
-                    ),
-                  ),
-                  barGroups: List.generate(
-                    4,
-                        (index) => _buildBarGroup(
-                      index,
-                      _chartData[_selectedTabIndex]![index],
-                      index % 2 == 0 ? Colors.red : Colors.pink.shade300,
                     ),
                   ),
                 ),
-              ),
-            )
-                : SizedBox(
-              height: 200,
-              child: BarChart(
-                BarChartData(
-                  gridData: FlGridData(
-                    show: true,
-                    drawHorizontalLine: true,
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine:
-                        (value) => FlLine(color: Colors.grey, strokeWidth: 1.2),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        // reservedSize: 30,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            value.toInt().toString(),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                          );
-                        },
+              ) : SizedBox(
+                  height: 200,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 30),
+                    child: const SpinKitCircle(color: Color.fromRGBO(236, 0, 60, 1),size: 50),
+                  ))
+                  : model.fetchDataYear.isNotEmpty ? SizedBox(
+                height: 200,
+                child: BarChart(
+                  BarChartData(
+                    gridData: FlGridData(
+                      show: true,
+                      drawHorizontalLine: true,
+                      drawVerticalLine: false,
+                      getDrawingHorizontalLine:
+                          (value) => FlLine(color: Colors.grey, strokeWidth: 1.2),
+                    ),
+                    borderData: FlBorderData(show: false),
+                    titlesData: FlTitlesData(
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          // reservedSize: 30,
+                          getTitlesWidget: (value, meta) {
+                            return Text(
+                              value.toInt().toString(),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            List<String> days = [
+                              "Jan",
+                              "Feb",
+                              "Mar",
+                              "Apr",
+                              "May",
+                              "Jun",
+                              "Jul",
+                              "Aug",
+                              "Sep",
+                              "Oct",
+                              "Nov",
+                              "Dec",
+                            ];
+                            return value.toInt() >= 0 &&
+                                value.toInt() < days.length
+                                ? Text(
+                              days[value.toInt()],
+                              style: const TextStyle(fontSize: 9),
+                            )
+                                : Container();
+                          },
+                        ),
                       ),
                     ),
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          List<String> days = [
-                            "Jan",
-                            "Feb",
-                            "Mar",
-                            "Apr",
-                            "May",
-                            "Jun",
-                            "Jul",
-                            "Aug",
-                            "Sep",
-                            "Oct",
-                            "Nov",
-                            "Dec",
-                          ];
-                          return value.toInt() >= 0 &&
-                              value.toInt() < days.length
-                              ? Text(
-                            days[value.toInt()],
-                            style: const TextStyle(fontSize: 9),
-                          )
-                              : Container();
-                        },
+                    barGroups: List.generate(
+                      12,
+                          (index) => _buildBarGroup(
+                        index,
+                        model.fetchDataYear[_selectedTabIndex]![index],
+                        index % 2 == 0 ? Colors.red : Colors.pink.shade300,
                       ),
-                    ),
-                  ),
-                  barGroups: List.generate(
-                    12,
-                        (index) => _buildBarGroup(
-                      index,
-                      _chartData[_selectedTabIndex]![index],
-                      index % 2 == 0 ? Colors.red : Colors.pink.shade300,
                     ),
                   ),
                 ),
-              ),
-            ),
-          ],
-        ),
+              ) : SizedBox(
+                  height: 200,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 30),
+                    child: const SpinKitCircle(color: Color.fromRGBO(236, 0, 60, 1),size: 50),
+                  )),
+            ],
+          );
+        })
       ),
     );
   }

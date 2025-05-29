@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 
+import '../Models/Attendance_Moldel.dart';
+
 class UserService {
 
   Future<Map<String, dynamic>?> fetchCurrentUserData() async {
@@ -164,5 +166,75 @@ class UserService {
     model.setAttendanceRecords(tempRecords);
     model.setAllWorkedDurations(tempDurations);
   }
+
+  Future<List<AttendanceModel>> fetchAttendanceForMonth({
+    required int month,
+  }) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    int year = DateTime.now().year;
+    List<AttendanceModel> monthlyData = [];
+
+    final DateFormat docIdFormat = DateFormat('dd-MM-yyyy');
+    final DateFormat displayFormat = DateFormat('dd MMM');
+
+    // Start and end of selected month
+    DateTime firstDay = DateTime(year, month, 1);
+    DateTime lastDay = DateTime(year, month + 1, 0);
+
+    for (int day = 0; day <= lastDay.day - 1; day++) {
+      DateTime currentDate = firstDay.add(Duration(days: day));
+      String docId = docIdFormat.format(currentDate);
+      String displayDate = displayFormat.format(currentDate);
+
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('Attendance')
+          .doc(userId)
+          .collection('records')
+          .doc(docId)
+          .get();
+
+      if (snapshot.exists) {
+        Timestamp? checkInTimestamp = snapshot['checkIn'];
+        Timestamp? checkOutTimestamp = snapshot['checkOut'];
+
+        DateTime checkInTime = checkInTimestamp!.toDate();
+        DateTime checkOutTime = checkOutTimestamp!.toDate();
+
+        Duration duration = checkOutTime.difference(checkInTime);
+        int hours = duration.inHours;
+        int minutes = duration.inMinutes.remainder(60);
+
+        String formattedHours = '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+
+        String status = 'Full Day';
+        if (hours < 8) {
+          status = 'Early Leave';
+        }
+
+        monthlyData.add(
+          AttendanceModel(
+            date: displayDate,
+            checkIn: DateFormat('hh:mm a').format(checkInTime),
+            checkOut: DateFormat('hh:mm a').format(checkOutTime),
+            hours: formattedHours,
+            status: status,
+          ),
+        );
+      } else {
+        monthlyData.add(
+          AttendanceModel(
+            date: displayDate,
+            checkIn: '--:--',
+            checkOut: '--:--',
+            hours: '--:--',
+            status: 'Absent',
+          ),
+        );
+      }
+    }
+
+    return monthlyData;
+  }
+
 
 }

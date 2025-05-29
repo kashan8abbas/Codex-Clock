@@ -13,12 +13,6 @@ class WorkedEntry {
 
 class SummaryViewModel extends ChangeNotifier {
 
-  final UserService _userService = UserService();
-
-  SummaryViewModel() {
-    _userService.loadAttendanceRecords(this);
-  }
-
   int selectedTab = 0;
   DateTime focusedDay = DateTime.now();
 
@@ -71,17 +65,86 @@ class SummaryViewModel extends ChangeNotifier {
 
   /// ---------------- Duration Calculations ----------------
   List<double> getDailyWorkedHours(DateTime referenceDate) {
-    final startOfWeek = referenceDate.subtract(Duration(days: referenceDate.weekday)); // Monday
-    final endOfWeek = startOfWeek.add(const Duration(days: 7));
-    List<double> tempList = [];
-    print(allWorkedDurations.first.date);
-    for (final entry in allWorkedDurations) {
-      if (!entry.date.isBefore(startOfWeek) && entry.date.isBefore(endOfWeek)) {
-        print(entry.duration.inHours.toDouble());
-        tempList.add(entry.duration.inHours.toDouble());
+    final startOfWeek = referenceDate.subtract(Duration(days: referenceDate.weekday - 1)); // Monday
+    List<double> dailyHours = List.filled(5, 0.0); // Monday to Friday
+
+    for (final entry in _allWorkedDurations) {
+      final entryDate = entry.date;
+      for (int i = 0; i < 5; i++) {
+        final currentDay = startOfWeek.add(Duration(days: i));
+        if (_isSameDate(entryDate, currentDay)) {
+          dailyHours[i] = entry.duration.inHours.toDouble();
+          break;
+        }
       }
     }
-    return tempList;
+    return dailyHours;
+  }
+
+  List<double> getWeeklyWorkedHoursTotalsForMonth(int year, int month) {
+    List<double> weeklyTotals = [];
+
+    DateTime firstDayOfMonth = DateTime(year, month, 1);
+    DateTime lastDayOfMonth = DateTime(year, month + 1, 0);
+
+    // Find the first Monday on or after the 1st
+    DateTime currentMonday = firstDayOfMonth;
+    while (currentMonday.weekday != DateTime.monday) {
+      currentMonday = currentMonday.add(const Duration(days: 1));
+    }
+
+    while (currentMonday.isBefore(lastDayOfMonth) || _isSameDate(currentMonday, lastDayOfMonth)) {
+      List<double> dailyHours = [];
+
+      for (int i = 0; i < 5; i++) {
+        DateTime currentDay = currentMonday.add(Duration(days: i));
+        if (currentDay.month != month || currentDay.isAfter(lastDayOfMonth)) break;
+
+        double hours = 0.0;
+        for (final entry in _allWorkedDurations) {
+          if (_isSameDate(entry.date, currentDay)) {
+            hours = entry.duration.inMinutes / 60.0;
+            break;
+          }
+        }
+
+        dailyHours.add(double.parse(hours.toStringAsFixed(1)));
+      }
+
+      double total = dailyHours.fold(0.0, (sum, h) => sum + h);
+      weeklyTotals.add(total);
+
+      currentMonday = currentMonday.add(const Duration(days: 7));
+    }
+
+    return weeklyTotals;
+  }
+
+  List<double> getMonthlyWorkedHoursTotalsForYear(int year) {
+    List<double> monthlyTotals = [];
+
+    for (int month = 1; month <= 12; month++) {
+      DateTime firstDayOfMonth = DateTime(year, month, 1);
+      DateTime lastDayOfMonth = DateTime(year, month + 1, 0);
+
+      double totalMinutes = 0.0;
+
+      for (final entry in _allWorkedDurations) {
+        if (entry.date.isAfter(lastDayOfMonth) || entry.date.isBefore(firstDayOfMonth)) continue;
+
+        totalMinutes += entry.duration.inMinutes;
+      }
+
+      double totalHours = totalMinutes / 60.0;
+      monthlyTotals.add(double.parse(totalHours.toStringAsFixed(1))); // 1 decimal
+    }
+
+    return monthlyTotals;
+  }
+
+
+  bool _isSameDate(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
   Duration getWeeklyWorkedHours(DateTime referenceDate) {
@@ -104,7 +167,7 @@ class SummaryViewModel extends ChangeNotifier {
 
   Duration _sumDurationsBetween(DateTime start, DateTime end) {
     Duration total = Duration();
-    for (final entry in allWorkedDurations) {
+    for (final entry in _allWorkedDurations) {
       if (!entry.date.isBefore(start) && entry.date.isBefore(end)) {
         total += entry.duration;
       }
