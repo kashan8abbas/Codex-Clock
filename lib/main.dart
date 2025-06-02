@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'ViewModels/QRLoadingViewModel.dart';
+import 'ViewModels/Salary_ViewModel.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -66,6 +67,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => SummaryViewModel()),
         ChangeNotifierProvider(create: (_) => HomeViewmodel()),
         ChangeNotifierProvider(create: (_) => AttendanceViewModel()),
+        ChangeNotifierProvider(create: (_) => SalaryViewModel()),
 
       ],
       child: MaterialApp(

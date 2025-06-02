@@ -4,6 +4,8 @@ import 'package:codex_clock/Views/Screens/AdditionalScreens/SummaryScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../Screens/AdditionalScreens/SalaryScreen.dart';
+
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({Key? key}) : super(key: key);
 
@@ -116,7 +118,9 @@ class CustomDrawer extends StatelessWidget {
                 child: _buildMenuItem("Leave Requests"),
               ),
               const SizedBox(height: 5),
-              TextButton(onPressed: () {}, child: _buildMenuItem("Salary")),
+              TextButton(onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SalaryScreen()));
+              }, child: _buildMenuItem("Salary")),
 
               const Spacer(),
 
