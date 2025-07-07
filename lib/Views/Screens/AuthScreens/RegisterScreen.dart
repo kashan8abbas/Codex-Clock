@@ -14,8 +14,7 @@ import 'RegisterScreen_2.dart';
 
 class RegistrationScreen extends StatelessWidget {
   final String uid;
-  final String phone;
-  const RegistrationScreen({super.key, required this.uid, required this.phone});
+  const RegistrationScreen({super.key, this.uid = ''});
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +44,7 @@ class RegistrationScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+
                   Center(
                     child: Stack(
                       children: [
@@ -65,7 +65,7 @@ class RegistrationScreen extends StatelessWidget {
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: const Color.fromRGBO(236, 0, 60, 1),
-                                width: 2.5,
+                                width: 1.5,
                               ),
                             ),
                             child: cameraViewModel.selectedImage == null
@@ -128,7 +128,7 @@ class RegistrationScreen extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 15),
                   const CustomLabel(text: "Enter C.N.I.C No"),
                   CustomTextField(
                     hint: "XXXXX-XXXXXXX-X",
@@ -136,24 +136,37 @@ class RegistrationScreen extends StatelessWidget {
                     focusNode: viewModel.cnicFocusNode,
                     isCnic: true,
                     errorText: viewModel.cnicError,
+                    function: (value) => viewModel.setCNIC(value),
                   ),
 
                   const SizedBox(height: 15),
-                  const CustomLabel(text: "Enter Your Permanent Address"),
+                  const CustomLabel(text: "Enter Your Email"),
                   CustomTextField(
-                    hint: "Permanent Address",
-                    controller: viewModel.permanentAddressController,
-                    focusNode: viewModel.permanentAddressFocusNode,
-                    errorText: viewModel.permanentError,
+                    hint: "abc@example.xyz",
+                    controller: viewModel.emailController,
+                    focusNode: viewModel.emailFocusNode,
+                    errorText: viewModel.emailError,
                   ),
 
                   const SizedBox(height: 15),
-                  const CustomLabel(text: "Enter Your Current Address"),
+                  const CustomLabel(text: "Enter Your Phone No."),
                   CustomTextField(
-                    hint: "Current Address",
-                    controller: viewModel.currentAddressController,
-                    focusNode: viewModel.currentAddressFocusNode,
-                    errorText: viewModel.currentError,
+                    hint: "XXX-XXXXXXX",
+                    controller: viewModel.phoneController,
+                    focusNode: viewModel.phoneFocusNode,
+                    errorText: viewModel.phoneError,
+                    isPhoneField: true,
+                    function: (value) => viewModel.setPhone(value),
+                  ),
+
+                  const SizedBox(height: 15),
+                  const CustomLabel(text: "Enter Your Password"),
+                  CustomTextField(
+                    hint: "Password",
+                    controller: viewModel.passwordController,
+                    focusNode: viewModel.passwordFocusNode,
+                    errorText: viewModel.passwordError,
+                    obscureText: true,
                   ),
 
 
@@ -168,14 +181,12 @@ class RegistrationScreen extends StatelessWidget {
                         if (viewModel.validateForm()) {
                           Navigator.push(context, MaterialPageRoute(builder: (context) =>
                               Registration2Screen(
-                                uid: uid,
                                 firstName: viewModel.firstNameController.text.trim(),
                                 lastName: viewModel.lastNameController.text.trim(),
                                 cnic: viewModel.cnicController.text.trim(),
-                                permanentAddress: viewModel.permanentAddressController.text.trim(),
-                                currentAddress: viewModel.currentAddressController.text.trim(),
-                                phone: phone,
-
+                                email: viewModel.emailController.text.trim(),
+                                phone: viewModel.phoneController.text.trim(),
+                                password: viewModel.passwordController.text.trim(),
                               )
                           ));
                         }
@@ -185,6 +196,8 @@ class RegistrationScreen extends StatelessWidget {
                       }
                     },
                   ),
+
+
                 ],
               ),
             ),

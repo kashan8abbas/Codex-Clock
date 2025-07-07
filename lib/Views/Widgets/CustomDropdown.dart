@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
 class CustomDropdown extends StatelessWidget {
-  final String label;
   final List<String> items;
   final String? selectedValue;
   final Function(String?)? onChanged;
   final Widget text;
+  final String? errorText;
 
   const CustomDropdown({
     super.key,
-    required this.label,
     required this.items,
     this.selectedValue,
     this.onChanged,
-    required this.text
+    required this.text,
+    this.errorText,
   });
 
   @override
@@ -21,10 +21,9 @@ class CustomDropdown extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 5),
         DropdownButtonFormField<String>(
           hint: text,
+
           value:
               (selectedValue != null && items.contains(selectedValue))
                   ? selectedValue
@@ -50,6 +49,13 @@ class CustomDropdown extends StatelessWidget {
               }).toList(),
           onChanged: onChanged,
         ),
+        if (errorText != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            errorText!,
+            style: const TextStyle(color: Colors.red, fontSize: 12),
+          ),
+        ],
       ],
     );
   }

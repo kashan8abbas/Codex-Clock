@@ -1,5 +1,6 @@
 import 'package:codex_clock/ViewModels/Attendence_ViewModel.dart';
 import 'package:codex_clock/ViewModels/CompanyData_ViewModel.dart';
+import 'package:codex_clock/ViewModels/CorrectionRequestViewModel.dart';
 import 'package:codex_clock/ViewModels/Home_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Leave_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
@@ -9,6 +10,7 @@ import 'package:codex_clock/ViewModels/Register2_VIewModel.dart';
 import 'package:codex_clock/ViewModels/Summary_ViewModel.dart';
 import 'package:codex_clock/ViewModels/TakePhoto_ViewModel.dart';
 import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
+import 'package:codex_clock/Views/Screens/AuthScreens/EmailLoginScreen.dart';
 import 'package:codex_clock/Views/Screens/AuthScreens/PhoneLoginScreen.dart';
 import 'package:codex_clock/Views/Screens/HomePages/HomeScreen.dart';
 import 'package:codex_clock/test.dart';
@@ -68,11 +70,12 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => HomeViewmodel()),
         ChangeNotifierProvider(create: (_) => AttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => SalaryViewModel()),
+        ChangeNotifierProvider(create: (_) => CorrectionRequestViewModel()),
 
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: _isFirstTimeUser ? PhoneLoginScreen() : HomeScreen(),
+          home: _isFirstTimeUser ? EmailLoginScreen() : HomeScreen(),
         theme: ThemeData(
           textSelectionTheme: const TextSelectionThemeData(
 

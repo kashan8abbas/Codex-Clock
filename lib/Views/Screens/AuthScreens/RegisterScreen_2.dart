@@ -18,22 +18,20 @@ import '../HomePages/HomeScreen.dart';
 import 'TakePhotoScreen.dart';
 
 class Registration2Screen extends StatelessWidget {
-  final String uid;
   final String firstName;
   final String lastName;
   final String cnic;
-  final String permanentAddress;
-  final String currentAddress;
+  final String email;
   final String phone;
+  final String password;
 
   Registration2Screen({super.key,
-    required this.uid,
     required this.firstName,
     required this.lastName,
     required this.cnic,
-    required this.permanentAddress,
-    required this.currentAddress,
-    required this.phone
+    required this.email,
+    required this.phone,
+    required this.password
   });
 
   final AuthService _authService = AuthService();
@@ -128,8 +126,9 @@ class Registration2Screen extends StatelessWidget {
               ),
 
               const SizedBox(height: 15),
+              const CustomLabel(text: "Select Your Designation"),
+              SizedBox(height: 5,),
               CustomDropdown(
-                label: "Select Your Designation",
                 items: ["CEO", "COO", "CTO", "HR",
                   "Flutter Team Lead", "Senior Flutter Developer",
                   "Junior Flutter Developer", "Shopify Team Lead", "Senior Shopify Developer",
@@ -139,7 +138,8 @@ class Registration2Screen extends StatelessWidget {
                   "Junior UI/UX Designer", "AI/ML"],
                 selectedValue: viewModel.selectedCategory,
                 onChanged: viewModel.setCategory,
-                text: Text('Select Designation'),
+                text: Text('Select Designation', style: TextStyle(color: Colors.grey, fontSize: 14),),
+                errorText: viewModel.categoryError,
               ),
 
               const SizedBox(height: 15),
@@ -149,56 +149,56 @@ class Registration2Screen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: CustomDropdown(
-                      label: "Day",
                       items: List.generate(
                         31,
                         (index) => (index + 1).toString(),
                       ),
-                      selectedValue: viewModel.selectedDay,
+                      selectedValue: viewModel.selectedDayDOB,
                       onChanged:
                           (value) {
                             viewModel.setDateOfBirth(
                               value!,
-                              viewModel.selectedMonth ?? "",
-                              viewModel.selectedYear ?? "",
+                              viewModel.selectedMonthDOB ?? "",
+                              viewModel.selectedYearDOB ?? "",
                             );
                       },
-                      text: Text('Day'),
+                      text: Text('Day', style: TextStyle(color: Colors.grey, fontSize: 14),),
+                      errorText: viewModel.dayDOBError,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: CustomDropdown(
-                      label: "Month",
                       items: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                      selectedValue: viewModel.selectedMonth,
+                      selectedValue: viewModel.selectedMonthDOB,
                       onChanged:
                           (value) => viewModel.setDateOfBirth(
-                            viewModel.selectedDay ?? "",
+                            viewModel.selectedDayDOB ?? "",
                             value!,
-                            viewModel.selectedYear ?? "",
+                            viewModel.selectedYearDOB ?? "",
                           ),
-                      text: Text('Month'),
+                      text: Text('Month', style: TextStyle(color: Colors.grey, fontSize: 14),),
+                      errorText: viewModel.monthDOBError,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: CustomDropdown(
-                      label: "Year",
                       items: List.generate(
                         50,
                         (index) => (2025 - index).toString(),
                       ),
-                      selectedValue: viewModel.selectedYear,
+                      selectedValue: viewModel.selectedYearDOB,
                       onChanged:
                           (value) {
                             viewModel.setDateOfBirth(
-                              viewModel.selectedDay ?? "",
-                              viewModel.selectedMonth ?? "",
+                              viewModel.selectedDayDOB ?? "",
+                              viewModel.selectedMonthDOB ?? "",
                               value!,
                             );
                       },
-                      text: Text('Year'),
+                      text: Text('Year', style: TextStyle(color: Colors.grey, fontSize: 14),),
+                      errorText: viewModel.yearDOBError,
                     ),
                   ),
                 ],
@@ -206,9 +206,92 @@ class Registration2Screen extends StatelessWidget {
 
               const SizedBox(height: 15),
               CustomLabel(text: "Gender"),
+              SizedBox(height: 5,),
               Customradio(
                 genderList: ["Male", "Female"],
+                selectedGender: viewModel.selectedGender,
                 onGenderSelected: viewModel.setGender,
+                errorText: viewModel.genderError,
+              ),
+
+              const SizedBox(height: 15),
+              const CustomLabel(text: "Enter Your Permanent Address"),
+              CustomTextField(
+                hint: "Permanent address",
+                controller: viewModel.permanentController,
+                focusNode: viewModel.permanentFocusNode,
+                errorText: viewModel.permanentError,
+              ),
+
+              const SizedBox(height: 15),
+              const CustomLabel(text: "Enter Your Current Address"),
+              CustomTextField(
+                hint: "Current address",
+                controller: viewModel.currentController,
+                focusNode: viewModel.currentFocusNode,
+                errorText: viewModel.currentError,
+              ),
+
+              const SizedBox(height: 15),
+              const CustomLabel(text: "Joining Date"),
+              const SizedBox(height: 5),
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomDropdown(
+                      items: List.generate(
+                        31,
+                            (index) => (index + 1).toString(),
+                      ),
+                      selectedValue: viewModel.selectedDayJD,
+                      onChanged:
+                          (value) {
+                        viewModel.setDateOfJoining(
+                          value!,
+                          viewModel.selectedMonthJD ?? "",
+                          viewModel.selectedYearJD ?? "",
+                        );
+                      },
+                      text: Text('Day', style: TextStyle(color: Colors.grey, fontSize: 14),),
+                      errorText: viewModel.dayJDError,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: CustomDropdown(
+                      items: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                      selectedValue: viewModel.selectedMonthJD,
+                      onChanged:
+                          (value) => viewModel.setDateOfJoining(
+                        viewModel.selectedDayJD ?? "",
+                        value!,
+                        viewModel.selectedYearJD ?? "",
+                      ),
+                      text: Text('Month', style: TextStyle(color: Colors.grey, fontSize: 14),),
+                      errorText: viewModel.monthJDError,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: CustomDropdown(
+                      items: List.generate(
+                        50,
+                            (index) => (2025 - index).toString(),
+                      ),
+                      selectedValue: viewModel.selectedYearJD,
+                      onChanged:
+                          (value) {
+                        viewModel.setDateOfJoining(
+                          viewModel.selectedDayJD ?? "",
+                          viewModel.selectedMonthJD ?? "",
+                          value!,
+                        );
+                      },
+                      text: Text('Year', style: TextStyle(color: Colors.grey, fontSize: 14),),
+                      errorText: viewModel.yearJDError,
+                    ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 15),
@@ -220,38 +303,46 @@ class Registration2Screen extends StatelessWidget {
                     if (viewModel.validateForm()) {
                       loadingViewModel.setLoading(true);
                       _authService.signUpService(
-                          uid: uid,
                           firstName: firstName,
                           lastName: lastName,
                           cnic: cnic,
-                          permanentAddress: permanentAddress,
-                          currentAddress: currentAddress,
+                          phone: phone,
+                          email: email,
+                          password: password,
+                          position: viewModel.selectedCategory!,
                           dateOfBirth: {
-                            'day': viewModel.selectedDay,
-                            'month': viewModel.selectedMonth,
-                            'year': viewModel.selectedYear
+                            'day': viewModel.selectedDayDOB,
+                            'month': viewModel.selectedMonthDOB,
+                            'year': viewModel.selectedYearDOB
                           },
                           gender: viewModel.selectedGender,
-                          phone: phone,
-                          position: viewModel.selectedCategory!,
+                          permanentAddress: viewModel.permanentController.text.trim(),
+                          currentAddress: viewModel.currentController.text.trim(),
+                          dateOfJoining: {
+                            'day': viewModel.selectedDayJD,
+                            'month': viewModel.selectedMonthJD,
+                            'year': viewModel.selectedYearJD
+                          },
                         imageFile: cameraViewModel.selectedImage!
                       ).then((value) {
                         _userService.fetchCurrentUserData().then((userData) {
                           if(userData != null) {
                             userDataViewModel.updateUserData(
-                                userData["Uid"],
-                                userData["cnic"],
-                                userData["currentAddress"],
-                                userData["dateOfBirth"],
-                                userData["email"] ?? '',
+                                userData["uid"],
                                 userData["firstName"],
-                                userData["gender"],
                                 userData["lastName"],
-                                userData["permanentAddress"],
+                                userData["cnic"],
                                 userData["phone"],
+                                userData["email"],
                                 userData["position"],
+                                userData["dateOfBirth"],
+                                userData["gender"],
+                                userData["permanentAddress"],
+                                userData["currentAddress"],
+                                userData["dateOfJoining"],
                                 userData["profilePic"],
-                                userData["createdAt"]
+                                userData["createdAt"],
+                                userData["status"]
                             );
                             loadingViewModel.setLoading(false);
                             Navigator.push(
@@ -278,6 +369,8 @@ class Registration2Screen extends StatelessWidget {
                   }
                 },
               ),
+
+              const SizedBox(height: 20),
             ],
           ),
         ),

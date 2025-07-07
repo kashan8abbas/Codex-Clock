@@ -29,7 +29,7 @@ class SummaryScreen extends StatelessWidget {
                     const Text(
                       "Summary",
                       style: TextStyle(
-                        fontSize: 25,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),

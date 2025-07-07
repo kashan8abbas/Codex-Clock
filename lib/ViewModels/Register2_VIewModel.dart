@@ -2,16 +2,27 @@ import 'package:flutter/material.dart';
 
 class SignUpViewModel extends ChangeNotifier {
   String? selectedCategory;
-  String? selectedDay, selectedMonth, selectedYear;
-  String selectedGender = "Male";
+  String? selectedDayDOB, selectedMonthDOB, selectedYearDOB;
+  String? selectedDayJD, selectedMonthJD, selectedYearJD;
+  String selectedGender = "";
+  final TextEditingController permanentController = TextEditingController();
+  final TextEditingController currentController = TextEditingController();
+
+  final FocusNode permanentFocusNode = FocusNode();
+  final FocusNode currentFocusNode = FocusNode();
 
 
   // Form validation errors
   String? categoryError;
-  String? dayError;
-  String? monthError;
-  String? yearError;
+  String? dayDOBError;
+  String? monthDOBError;
+  String? yearDOBError;
+  String? dayJDError;
+  String? monthJDError;
+  String? yearJDError;
   String? genderError;
+  String? permanentError;
+  String? currentError;
 
 
   bool validateForm() {
@@ -26,25 +37,46 @@ class SignUpViewModel extends ChangeNotifier {
     }
 
     // Date of Birth validation
-    if (selectedDay == null) {
-      dayError = "Day is required";
+    if (selectedDayDOB == null) {
+      dayDOBError = "Day is required";
       isValid = false;
     } else {
-      dayError = null;
+      dayDOBError = null;
     }
 
-    if (selectedMonth == null) {
-      monthError = "Month is required";
+    if (selectedMonthDOB == null) {
+      monthDOBError = "Month is required";
       isValid = false;
     } else {
-      monthError = null;
+      monthDOBError = null;
     }
 
-    if (selectedYear == null) {
-      yearError = "Year is required";
+    if (selectedYearDOB == null) {
+      yearDOBError = "Year is required";
       isValid = false;
     } else {
-      yearError = null;
+      yearDOBError = null;
+    }
+
+    if (selectedDayJD == null) {
+      dayJDError = "Day is required";
+      isValid = false;
+    } else {
+      dayJDError = null;
+    }
+
+    if (selectedMonthJD == null) {
+      monthJDError = "Month is required";
+      isValid = false;
+    } else {
+      monthJDError = null;
+    }
+
+    if (selectedYearJD == null) {
+      yearJDError = "Year is required";
+      isValid = false;
+    } else {
+      yearJDError = null;
     }
 
     // Gender validation
@@ -55,6 +87,19 @@ class SignUpViewModel extends ChangeNotifier {
       genderError = null;
     }
 
+    if(permanentController.text.isEmpty) {
+      permanentError = "Permanent Address is required";
+      isValid = false;
+    } else {
+      permanentError = null;
+    }
+
+    if(currentController.text.isEmpty) {
+      currentError = "Current Address is required";
+      isValid = false;
+    } else {
+      currentError = null;
+    }
 
     notifyListeners();
     return isValid;
@@ -67,9 +112,18 @@ class SignUpViewModel extends ChangeNotifier {
 
   void setDateOfBirth(String day, String month, String year) {
 
-    selectedDay = day;
-    selectedMonth = month;
-    selectedYear = year;
+    selectedDayDOB = day;
+    selectedMonthDOB = month;
+    selectedYearDOB = year;
+
+    notifyListeners();
+  }
+
+  void setDateOfJoining(String day, String month, String year) {
+
+    selectedDayJD = day;
+    selectedMonthJD = month;
+    selectedYearJD = year;
 
     notifyListeners();
   }

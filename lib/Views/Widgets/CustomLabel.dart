@@ -9,7 +9,7 @@ class CustomLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
+      child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
     );
   }
 }

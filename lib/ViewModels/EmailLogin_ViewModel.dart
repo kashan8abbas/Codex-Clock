@@ -17,6 +17,7 @@ class EmailLoginViewModel extends ChangeNotifier {
     } else {
       emailErrorText = null;
     }
+    notifyListeners();
   }
 
   void checkPassword() {
@@ -26,12 +27,15 @@ class EmailLoginViewModel extends ChangeNotifier {
     else {
       passwordErrorText = null;
     }
+    notifyListeners();
   }
 
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
     super.dispose();
   }
 }

@@ -33,7 +33,7 @@ class _SalaryScreenState extends State<SalaryScreen> {
                       const Text(
                         "Salary",
                         style: TextStyle(
-                          fontSize: 25,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),

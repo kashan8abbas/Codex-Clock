@@ -36,7 +36,7 @@ class ApplyLeaveScreen extends StatelessWidget {
                       const Text(
                         "Apply Leave",
                         style: TextStyle(
-                          fontSize: 25,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),

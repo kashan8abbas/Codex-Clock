@@ -1,4 +1,5 @@
 import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
+import 'package:codex_clock/Views/Screens/AdditionalScreens/CorrectionRequestScreen.dart';
 import 'package:codex_clock/Views/Screens/AdditionalScreens/LeaveScreen.dart';
 import 'package:codex_clock/Views/Screens/AdditionalScreens/SummaryScreen.dart';
 import 'package:flutter/material.dart';
@@ -12,47 +13,6 @@ class CustomDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userDataViewModel = Provider.of<UserDataViewModel>(context, listen: true);
-    String month = '';
-    switch (userDataViewModel.createdAt.toDate().month) {
-      case 1:
-        month = 'Jan';
-        break;
-      case 2:
-        month = 'Feb';
-        break;
-      case 3:
-        month = 'Mar';
-        break;
-      case 4:
-        month = 'Apr';
-        break;
-      case 5:
-        month = 'May';
-        break;
-      case 6:
-        month = 'Jun';
-        break;
-      case 7:
-        month = 'Jul';
-        break;
-      case 8:
-        month = 'Aug';
-        break;
-      case 9:
-        month = 'Sep';
-        break;
-      case 10:
-        month = 'Oct';
-        break;
-      case 11:
-        month = 'Nov';
-        break;
-      case 12:
-        month = 'Dec';
-        break;
-      default:
-        month = 'Unknown';
-    }
     return Drawer(
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
       child: SafeArea(
@@ -86,7 +46,7 @@ class CustomDrawer extends StatelessWidget {
                           style: TextStyle(fontSize: 14, color: Colors.black87),
                         ),
                         Text(
-                          "Since ${userDataViewModel.createdAt.toDate().day} $month ${userDataViewModel.createdAt.toDate().year}",
+                          "Since ${userDataViewModel.dateOfJoining['day']} ${userDataViewModel.dateOfJoining['month']} ${userDataViewModel.dateOfJoining['year']}",
                           style: TextStyle(fontSize: 14, color: Colors.black87),
                         ),
                       ],
@@ -120,7 +80,14 @@ class CustomDrawer extends StatelessWidget {
               const SizedBox(height: 5),
               TextButton(onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => SalaryScreen()));
-              }, child: _buildMenuItem("Salary")),
+              },
+                  child: _buildMenuItem("Salary")),
+
+              const SizedBox(height: 5),
+              TextButton(onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => CorrectionRequestScreen()));
+              },
+                  child: _buildMenuItem("Correction Request")),
 
               const Spacer(),
 

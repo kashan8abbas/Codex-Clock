@@ -1,96 +1,94 @@
 import 'package:flutter/material.dart';
 
-class Customradio extends StatefulWidget {
-  final Function(String) onGenderSelected;
+class Customradio extends StatelessWidget {
+  final String selectedGender;
   final List<String> genderList;
+  final Function(String) onGenderSelected;
+  final String? errorText;
 
   const Customradio({
     super.key,
-    required this.onGenderSelected,
     required this.genderList,
+    required this.selectedGender,
+    required this.onGenderSelected,
+    this.errorText
   });
-
-  @override
-  _CustomradioState createState() => _CustomradioState();
-}
-
-class _CustomradioState extends State<Customradio> {
-  late String selectedGender;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedGender = widget.genderList.first;
-  }
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(widget.genderList.length * 2 - 1, (index) {
-        if (index.isEven) {
-          bool isSelected = selectedGender == widget.genderList[index ~/ 2];
-          return Expanded(
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  selectedGender = widget.genderList[index ~/ 2];
-                });
-                widget.onGenderSelected(widget.genderList[index ~/ 2]);
-              },
-              child: Container(
-                height: screenHeight / 17,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected ? Color.fromRGBO(236, 0, 60, 1) : Colors.transparent,
-                    width: isSelected ? 1 : 0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 5,
-                      spreadRadius: 2,
-                      offset: const Offset(0, 2),
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(genderList.length * 2 - 1, (index) {
+            if (index.isEven) {
+              final gender = genderList[index ~/ 2];
+              final isSelected = selectedGender == gender;
+
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => onGenderSelected(gender),
+                  child: Container(
+                    height: screenHeight / 17,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 10,
                     ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      widget.genderList[index ~/ 2],
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.black,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: const Color.fromRGBO(236, 0, 60, 1),
+                        width: 1,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 5,
+                          spreadRadius: 2,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 10),
-                    Icon(
-                      isSelected
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_off,
-                      color:
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          gender,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Icon(
                           isSelected
-                              ? Color.fromRGBO(236, 0, 60, 1)
-                              : Colors.black,
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_off,
+                          color: const Color.fromRGBO(236, 0, 60, 1),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          );
-        } else {
-          return const SizedBox(width: 20); // Adjust spacing here
-        }
-      }),
+              );
+            } else {
+              return const SizedBox(width: 20);
+            }
+          }),
+        ),
+        if (errorText != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            errorText!,
+            style: const TextStyle(color: Colors.red, fontSize: 12),
+          ),
+        ],
+      ],
     );
   }
 }

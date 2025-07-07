@@ -125,6 +125,28 @@ class UserService {
 
   }
 
+  Future<void> applyCorrectionRequest(String reason, Map<String, dynamic> date, Map<String, dynamic> checkIn, Map<String, dynamic> checkOut) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return ;
+
+    final userId = user.uid;
+
+    FirebaseFirestore.instance
+        .collection('Correction')
+        .doc(userId)
+        .collection('records')
+        .add({
+      'appliedAt': Timestamp.now(),
+      'correction_date': date,
+      'correction_checkIn': checkIn,
+      'correction_checkOut': checkOut,
+      'reason': reason,
+      'status': 'pending',
+    });
+
+
+  }
+
   Future<void> loadAttendanceRecords(SummaryViewModel model) async {
     final userId = FirebaseAuth.instance.currentUser!.uid;
 

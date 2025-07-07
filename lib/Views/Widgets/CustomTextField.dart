@@ -9,6 +9,7 @@ class CustomTextField extends StatelessWidget {
   final bool isPhoneField;
   final bool isCnic;
   final String? errorText;
+  final void Function(String)? function;
 
   const CustomTextField({
     super.key,
@@ -20,6 +21,7 @@ class CustomTextField extends StatelessWidget {
         false, // Default is false, set true for phone number fields
     this.isCnic = false,
     this.errorText,
+    this.function,
   });
 
   @override
@@ -73,8 +75,10 @@ class CustomTextField extends StatelessWidget {
                       isPhoneField ? TextInputType.phone : isCnic ? TextInputType.number : TextInputType.text,
                   decoration: InputDecoration(
                     hintText: hint,
+                    hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                     border: InputBorder.none,
                   ),
+                  onChanged: function,
                 ),
               ),
             ],
