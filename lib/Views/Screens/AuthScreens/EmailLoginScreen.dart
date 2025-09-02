@@ -100,39 +100,36 @@ class EmailLoginScreen extends StatelessWidget {
                               _authService.signInWithEmail(email: viewModel.emailController.text.trim(), password: viewModel.passwordController.text.trim()).then((value) {
                                 if(value != null) {
                                   _userService.fetchCurrentUserData().then((userData) {
-                                    // if(value['status'] == 'success') {
-                                    //   _userService.fetchCurrentUserData().then((userData) {
-                                    //     if(userData != null) {
-                                    //       userDataViewModel.updateUserData(
-                                    //           userData["Uid"],
-                                    //           userData["cnic"],
-                                    //           userData["currentAddress"],
-                                    //           userData["dateOfBirth"],
-                                    //           userData["email"] ?? '',
-                                    //           userData["firstName"],
-                                    //           userData["gender"],
-                                    //           userData["lastName"],
-                                    //           userData["permanentAddress"],
-                                    //           userData["phone"],
-                                    //           userData["position"],
-                                    //           userData["profilePic"],
-                                    //           userData["createdAt"]
-                                    //       );
-                                    //       loadingViewModel.setLoading(false);
-                                    //       Navigator.push(
-                                    //         context,
-                                    //         MaterialPageRoute(
-                                    //           builder: (context) => HomeScreen(),
-                                    //         ),
-                                    //       );
-                                    //     }
-
-                                    //   });
-                                    // }
-                                    // else {
-                                    //   loadingViewModel.setLoading(false);
-                                    //   Utilities().errorMsg(value['error']);
-                                    // }
+                                    if(userData != null) {
+                                      userDataViewModel.updateUserData(
+                                          userData["Uid"],
+                                          userData["firstName"],
+                                          userData["lastName"],
+                                          userData["cnic"],
+                                          userData["phone"],
+                                          userData["email"],
+                                          userData["position"],
+                                          userData["dateOfBirth"],
+                                          userData["gender"],
+                                          userData["permanentAddress"],
+                                          userData["currentAddress"],
+                                          userData["dateOfJoining"],
+                                          userData["profilePic"],
+                                          userData["createdAt"],
+                                          userData["status"]
+                                      );
+                                      loadingViewModel.setLoading(false);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => HomeScreen(),
+                                        ),
+                                      );
+                                    }
+                                    else {
+                                      loadingViewModel.setLoading(false);
+                                      Utilities().errorMsg('Something Went Wrong');
+                                    }
                                   });
                                 }
                                 else {

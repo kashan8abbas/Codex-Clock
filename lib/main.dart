@@ -75,7 +75,7 @@ class _MyAppState extends State<MyApp> {
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: _isFirstTimeUser ? EmailLoginScreen() : HomeScreen(),
+          home: RandomAttendanceScreen(),
         theme: ThemeData(
           textSelectionTheme: const TextSelectionThemeData(
 

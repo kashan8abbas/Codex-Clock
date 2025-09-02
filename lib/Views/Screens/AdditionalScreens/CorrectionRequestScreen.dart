@@ -71,7 +71,7 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> {
                          child: CustomDropdown(
                            items: List.generate(
                              31,
-                                 (index) => (index + 1).toString(),
+                                 (index) => (index + 1).toString().length == 1 ? '0${(index + 1).toString()}' : (index + 1).toString(),
                            ),
                            selectedValue: viewModel.selectedDay,
                            onChanged:
@@ -140,7 +140,7 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> {
                          child: CustomDropdown(
                            items: List.generate(
                              12,
-                                 (index) => (index + 1).toString(),
+                                 (index) => (index + 1).toString().length == 1 ? '0${(index + 1).toString()}' : (index + 1).toString(),
                            ),
                            selectedValue: viewModel.selectedCheckInHour,
                            onChanged:
@@ -158,9 +158,9 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> {
                        Expanded(
                          child: CustomDropdown(
                            items: List.generate(
-                             60,
-                                 (index) => (index + 1).toString(),
-                           ),
+                             59,
+                                 (index) => (index + 1).toString().length == 1 ? '0${(index + 1).toString()}' : (index + 1).toString(),
+                           )..add("00"),
                            selectedValue: viewModel.selectedCheckInMint,
                            onChanged:
                                (value) {
@@ -192,7 +192,7 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> {
                          child: CustomDropdown(
                            items: List.generate(
                              12,
-                                 (index) => (index + 1).toString(),
+                                 (index) => (index + 1).toString().length == 1 ? '0${(index + 1).toString()}' : (index + 1).toString(),
                            ),
                            selectedValue: viewModel.selectedCheckOutHour,
                            onChanged:
@@ -210,9 +210,9 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> {
                        Expanded(
                          child: CustomDropdown(
                            items: List.generate(
-                             60,
-                                 (index) => (index + 1).toString(),
-                           ),
+                             59,
+                                 (index) => (index + 1).toString().length == 1 ? '0${(index + 1).toString()}' : (index + 1).toString(),
+                           )..add("00"),
                            selectedValue: viewModel.selectedCheckOutMint,
                            onChanged:
                                (value) {

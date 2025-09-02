@@ -113,7 +113,7 @@ class UserService {
     FirebaseFirestore.instance
         .collection('Leave')
         .doc(userId)
-        .collection('records')
+        .collection('leaveRecords')
         .add({
       'appliedAt': Timestamp.now(),
       'leaveDate': Timestamp.fromDate(selectedLeaveDate),
@@ -134,7 +134,7 @@ class UserService {
     FirebaseFirestore.instance
         .collection('Correction')
         .doc(userId)
-        .collection('records')
+        .collection('correctionRecords')
         .add({
       'appliedAt': Timestamp.now(),
       'correction_date': date,
