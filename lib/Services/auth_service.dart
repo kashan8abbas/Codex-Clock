@@ -98,7 +98,6 @@ class AuthService {
     required File imageFile,
   }) async {
     try {
-      // 1. Create user with email and password
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -123,7 +122,7 @@ class AuthService {
         'dateOfJoining': dateOfJoining,
         'profilePic': imageUrl ?? '',
         'createdAt': FieldValue.serverTimestamp(),
-        'status': 'Inactive'
+        'status': 'pending'
       });
     } catch (e) {
       // Handle errors appropriately

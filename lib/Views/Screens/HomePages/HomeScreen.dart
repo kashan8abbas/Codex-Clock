@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
     UserService().fetchCurrentUserData().then((userData) {
       if(userData != null) {
         userDataViewModel.updateUserData(
-            userData["uid"],
+            userData["Uid"],
             userData["firstName"],
             userData["lastName"],
             userData["cnic"],

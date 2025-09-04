@@ -148,6 +148,7 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> {
                              viewModel.setCheckInTime(
                                value!,
                                viewModel.selectedCheckInMint ?? "",
+                               viewModel.selectedCheckInPeriod ?? "",
                              );
                            },
                            text: Text('Hour', style: TextStyle(color: Colors.grey, fontSize: 14),),
@@ -167,10 +168,28 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> {
                              viewModel.setCheckInTime(
                                viewModel.selectedCheckInHour ?? "",
                                value!,
+                               viewModel.selectedCheckInPeriod ?? "",
                              );
                            },
                            text: Text('Minutes', style: TextStyle(color: Colors.grey, fontSize: 14),),
                            errorText: viewModel.selectedCheckInMintError,
+                         ),
+                       ),
+                       const SizedBox(width: 10),
+                       Expanded(
+                         child: CustomDropdown(
+                           items: ['AM', 'PM'],
+                           selectedValue: viewModel.selectedCheckInPeriod,
+                           onChanged:
+                               (value) {
+                             viewModel.setCheckInTime(
+                               viewModel.selectedCheckInHour ?? "",
+                               viewModel.selectedCheckInMint ?? "",
+                               value!,
+                             );
+                           },
+                           text: Text('Period', style: TextStyle(color: Colors.grey, fontSize: 14),),
+                           errorText: viewModel.selectedCheckInPeriodError,
                          ),
                        ),
                      ],
@@ -200,6 +219,7 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> {
                              viewModel.setCheckOutTime(
                                value!,
                                viewModel.selectedCheckOutMint ?? "",
+                               viewModel.selectedCheckOutPeriod ?? "",
                              );
                            },
                            text: Text('Hour', style: TextStyle(color: Colors.grey, fontSize: 14),),
@@ -219,10 +239,28 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> {
                              viewModel.setCheckOutTime(
                                viewModel.selectedCheckOutHour ?? "",
                                value!,
+                               viewModel.selectedCheckOutPeriod ?? "",
                              );
                            },
                            text: Text('Minutes', style: TextStyle(color: Colors.grey, fontSize: 14),),
                            errorText: viewModel.selectedCheckOutMintError,
+                         ),
+                       ),
+                       const SizedBox(width: 10),
+                       Expanded(
+                         child: CustomDropdown(
+                           items: ['AM', 'PM'],
+                           selectedValue: viewModel.selectedCheckOutPeriod,
+                           onChanged:
+                               (value) {
+                             viewModel.setCheckOutTime(
+                               viewModel.selectedCheckOutHour ?? "",
+                               viewModel.selectedCheckOutMint ?? "",
+                               value!,
+                             );
+                           },
+                           text: Text('Period', style: TextStyle(color: Colors.grey, fontSize: 14),),
+                           errorText: viewModel.selectedCheckOutPeriodError,
                          ),
                        ),
                      ],
@@ -302,10 +340,12 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> {
                            {
                              'hour': viewModel.selectedCheckInHour,
                              'mints': viewModel.selectedCheckInMint,
+                             'period': viewModel.selectedCheckInPeriod
                            },
                            {
                              'hour': viewModel.selectedCheckOutHour,
                              'mints': viewModel.selectedCheckOutMint,
+                             'period': viewModel.selectedCheckOutPeriod
                            },
                          ).then((_) {
                            loadingViewModel.setLoading(false);

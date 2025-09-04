@@ -328,7 +328,7 @@ class Registration2Screen extends StatelessWidget {
                         _userService.fetchCurrentUserData().then((userData) {
                           if(userData != null) {
                             userDataViewModel.updateUserData(
-                                userData["uid"],
+                                userData["Uid"],
                                 userData["firstName"],
                                 userData["lastName"],
                                 userData["cnic"],
