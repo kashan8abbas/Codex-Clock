@@ -1,16 +1,29 @@
 import 'package:codex_clock/ViewModels/Summary_ViewModel.dart';
+import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
 import 'package:codex_clock/Views/Screens/AdditionalScreens/AttendenceScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../../../ViewModels/CompanyData_ViewModel.dart';
+
 class SummaryScreen extends StatelessWidget {
   const SummaryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final companyModel = Provider.of<CompanyDataViewModel>(context, listen: true);
+    final userModel = Provider.of<UserDataViewModel>(context, listen: true);
     final size = MediaQuery.of(context).size;
+
+    final createdAtDate = userModel.createdAt.toDate();
+
+    final createdAtOnlyDate = DateTime(
+      createdAtDate.year,
+      createdAtDate.month,
+      createdAtDate.day,
+    );
     return Scaffold(
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
       body: SafeArea(
@@ -76,11 +89,11 @@ class SummaryScreen extends StatelessWidget {
 
                           // Summary Card
                           if (model.selectedTab == 0)
-                            _summaryCard("Weekly Summary", "40:00", model.formatDuration(model.getWeeklyWorkedHours(DateTime.now()))),
+                            _summaryCard("Weekly Summary", '${companyModel.weeklyHours['hour']}:${companyModel.weeklyHours['mint']}', model.formatDuration(model.getWeeklyWorkedHours(DateTime.now()))),
                           if (model.selectedTab == 1)
-                            _summaryCard("Monthly Summary", "160:00", model.formatDuration(model.getMonthlyWorkedHours(DateTime.now()))),
+                            _summaryCard("Monthly Summary", '${companyModel.monthlyHours['hour']}:${companyModel.monthlyHours['mint']}', model.formatDuration(model.getMonthlyWorkedHours(DateTime.now()))),
                           if (model.selectedTab == 2)
-                            _summaryCard("Yearly Summary", "1920:00", model.formatDuration(model.getYearlyWorkedHours(DateTime.now()))),
+                            _summaryCard("Yearly Summary", '${companyModel.yearlyHours['hour']}:${companyModel.yearlyHours['mint']}', model.formatDuration(model.getYearlyWorkedHours(DateTime.now()))),
                         ],
                       );
                       }
@@ -151,6 +164,7 @@ class SummaryScreen extends StatelessWidget {
                                   return _calendarDayWidget(
                                     formattedDay,
                                     Colors.blue,
+                                        Colors.white,
                                         () => _onDateSelected(context, day),
                                   );
                                 }
@@ -159,12 +173,21 @@ class SummaryScreen extends StatelessWidget {
                                   return model.attendanceRecords.containsKey(DateFormat('dd-MM-yyyy').format(day))
                                       ? _calendarDayWidget(
                                     formattedDay,
-                                    const Color.fromRGBO(0, 239, 64, 1), // Green = Present
+                                    const Color.fromRGBO(0, 239, 64, 1),
+                                    Colors.white,// Green = Present
                                         () => _onDateSelected(context, day),
                                   )
+                                      : day.isBefore(createdAtOnlyDate)
+                                      ? _calendarDayWidget(
+                                    formattedDay,
+                                    Colors.transparent,
+                                    Colors.black,// Red = Absent
+                                        () => _onDateSelected(context, day),
+                                    )
                                       : _calendarDayWidget(
                                     formattedDay,
-                                    const Color.fromRGBO(236, 0, 60, 1), // Red = Absent
+                                    const Color.fromRGBO(236, 0, 60, 1),
+                                    Colors.white,// Red = Absent
                                         () => _onDateSelected(context, day),
                                   );
                                 }
@@ -272,7 +295,7 @@ class SummaryScreen extends StatelessWidget {
     );
   }
 
-  Widget _calendarDayWidget(String dayText, Color color, VoidCallback onTap) {
+  Widget _calendarDayWidget(String dayText, Color color, Color textColor, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -284,8 +307,8 @@ class SummaryScreen extends StatelessWidget {
         ),
         child: Text(
           dayText,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: textColor,
             fontWeight: FontWeight.bold,
           ),
         ),

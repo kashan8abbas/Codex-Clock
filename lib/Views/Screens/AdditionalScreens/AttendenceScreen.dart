@@ -170,14 +170,27 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       context: context,
       builder: (context) {
         final model = Provider.of<AttendanceViewModel>(context, listen: false);
+
+        final currentYear = DateTime.now().year;
+        final currentMonth = DateTime.now().month;
+
+        // ✅ Show only past + current months if selected year is current year
+        final monthCount = model.selectedYear == currentYear ? currentMonth : 12;
+
         return AlertDialog(
           backgroundColor: Colors.white,
-          title: const Text('Select Month', style: TextStyle(color: Color.fromRGBO(236, 0, 60, 1),fontWeight: FontWeight.bold),),
+          title: const Text(
+            'Select Month',
+            style: TextStyle(
+              color: Color.fromRGBO(236, 0, 60, 1),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
               shrinkWrap: true,
-              itemCount: 12,
+              itemCount: monthCount,
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Text('${model.months[index]} ${model.selectedYear}'),
@@ -193,6 +206,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       },
     );
   }
+
 
 
 }

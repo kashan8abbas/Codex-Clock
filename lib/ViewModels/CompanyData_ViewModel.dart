@@ -5,10 +5,20 @@ class CompanyDataViewModel with ChangeNotifier {
   String _code = '';
   String _ip = '';
   bool _isCompany = false;
+  Map<String, dynamic> _timingFrom = {};
+  Map<String, dynamic> _timingTo = {};
+  Map<String, dynamic> _weeklyHours = {};
+  Map<String, dynamic> _monthlyHours = {};
+  Map<String, dynamic> _yearlyHours = {};
 
   String get code => _code;
   String get ip => _ip;
   bool get isCompany => _isCompany;
+  Map<String, dynamic> get timingFrom => _timingFrom;
+  Map<String, dynamic> get timingTo => _timingTo;
+  Map<String, dynamic> get weeklyHours => _weeklyHours;
+  Map<String, dynamic> get monthlyHours => _monthlyHours;
+  Map<String, dynamic> get yearlyHours => _yearlyHours;
 
   void updateCompanyCode(
       String code) {
@@ -24,6 +34,15 @@ class CompanyDataViewModel with ChangeNotifier {
 
   void updateIsCompany(bool value) {
     _isCompany = value;
+    notifyListeners();
+  }
+
+  void setTimings(Map<String, dynamic> from, Map<String, dynamic> to, Map<String, dynamic> weekly, Map<String, dynamic> monthly, Map<String, dynamic> yearly,){
+    _timingFrom = from;
+    _timingTo = to;
+    _weeklyHours = weekly;
+    _monthlyHours = monthly;
+    _yearlyHours = yearly;
     notifyListeners();
   }
 

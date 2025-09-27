@@ -34,7 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedTabIndex = 0;
   final List<String> _tabs = ["Weekly", "Monthly", "Yearly"];
 
-
   Timer? _timer;
 
   void updateTime() {
@@ -44,7 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     });
   }
-
 
   @override
   void dispose() {
@@ -112,6 +110,11 @@ class _HomeScreenState extends State<HomeScreen> {
         viewModel.updateCompanyIP(companyWiFi['ip_subnet']);
       }
     });
+    await appService.fetchCompanyTiming().then((companyTiming) {
+      if(companyTiming != null) {
+        viewModel.setTimings(companyTiming['from'], companyTiming['to'], companyTiming['weeklyHours'], companyTiming['monthlyHours'], companyTiming['yearlyHours']);
+      }
+    });
   }
 
   void fetchChartData(SummaryViewModel model, HomeViewmodel homeViewmodel) async {
@@ -171,13 +174,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 30),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            IconButton(
-                              onPressed: () {
+                            InkWell(
+                              onTap: () {
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
                               },
-                              icon: SizedBox(
+                              child: SizedBox(
                                 width: 60,
                                 height: 60,
                                 child: ClipOval(
@@ -190,7 +193,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
 
-                            const Spacer(),
 
                             Text(
                               "${userDataViewModel.firstName} ${userDataViewModel.lastName}",
@@ -200,10 +202,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Color.fromARGB(255, 0, 0, 0),
                               ),
                             ),
+ 
 
-                            const Spacer(),
-
-                            const SizedBox(width: 60), // Keeps spacing balanced
+                            Icon(Icons.notifications_active_outlined, size: 30,), // Keeps spacing balanced
                           ],
                         ),
                       ),

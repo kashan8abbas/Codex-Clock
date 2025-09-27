@@ -16,19 +16,43 @@ import 'package:codex_clock/Views/Screens/HomePages/HomeScreen.dart';
 import 'package:codex_clock/test.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'Services/push_notification_service.dart';
+import 'Services/server_key.dart';
 import 'ViewModels/QRLoadingViewModel.dart';
 import 'ViewModels/Salary_ViewModel.dart';
 import 'firebase_options.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  if (message.data.isNotEmpty) {
+    PushNotificationService.displayNotification(message);
+  }
+}
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  getToken();
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
+}
+
+void getToken() async {
+  String? token = await FirebaseMessaging.instance.getToken();
+  print(token);
+  String key = await get_server_key().server_token();
+  print(key);
 }
 
 class MyApp extends StatefulWidget {
@@ -39,12 +63,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final PushNotificationService _notificationService = PushNotificationService();
   final FirebaseAuth auth = FirebaseAuth.instance;
   bool _isFirstTimeUser = true;
 
   @override
   void initState() {
     super.initState();
+
+    _notificationService.initialize(context);
+    _notificationService.isTokenRefresh();
     _isFirstTimeUser = auth.currentUser == null;
     auth.authStateChanges().listen((user) {
       setState(() {
@@ -75,7 +103,7 @@ class _MyAppState extends State<MyApp> {
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: EmailLoginScreen(),
+          home: _isFirstTimeUser ? EmailLoginScreen() : HomeScreen(),
         theme: ThemeData(
           textSelectionTheme: const TextSelectionThemeData(
 

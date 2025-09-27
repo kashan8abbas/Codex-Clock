@@ -44,6 +44,25 @@ class AppService {
     return null;
   }
 
+  Future<Map<String, dynamic>?> fetchCompanyTiming() async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> companyDocument = await FirebaseFirestore.instance
+          .collection('Company')
+          .doc('timing')
+          .get();
+
+      if (companyDocument.exists) {
+        Map<String, dynamic> companyData = companyDocument.data() ?? {};
+
+        return companyData;
+      } else {
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch current user data");
+    }
+    return null;
+  }
+
   void openWifiSettings() {
     final intent = AndroidIntent(
       action: 'android.settings.WIFI_SETTINGS',
