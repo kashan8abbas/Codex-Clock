@@ -1,13 +1,18 @@
+import 'package:codex_clock/Services/push_notification_service.dart';
 import 'package:codex_clock/Services/user_service.dart';
 import 'package:codex_clock/Utils/Utilities.dart';
 import 'package:codex_clock/ViewModels/Leave_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Loading_ViewModel.dart';
+import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
+import 'package:codex_clock/ViewModels/admin_fcmtoken.dart';
 import 'package:codex_clock/Views/Widgets/BottomSheet.dart';
 import 'package:codex_clock/Views/Widgets/CustomButton.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+
+import '../../../Services/add_notification_service.dart';
 
 class ApplyLeaveScreen extends StatelessWidget {
 
@@ -16,6 +21,8 @@ class ApplyLeaveScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loadingViewModel = Provider.of<LoadingViewModel>(context, listen: true);
+    final adminTokenViewModel = Provider.of<AdminFcmTokenViewModel>(context, listen: true);
+    final userViewModel = Provider.of<UserDataViewModel>(context, listen: true);
     return ChangeNotifierProvider(
       create: (_) => ApplyLeaveViewModel(),
       child: Scaffold(
@@ -187,6 +194,9 @@ class ApplyLeaveScreen extends StatelessWidget {
                                 if(model.selectedDate.isAfter(DateTime.now())) {
                                   loadingViewModel.setLoading(true);
                                   _userService.applyLeave(model.note, model.selectedDate, model.selectedLeaveType).then((_) {
+                                    PushNotificationService().sendNotification(adminTokenViewModel.adminToken, 'Leave Request', 'Leave Request From ${userViewModel.firstName}').then((_) {
+                                      AdminNotificationService().addNotification(title: 'Leave Request', description: 'Leave Request From ${userViewModel.firstName}', userName: '${userViewModel.firstName} ${userViewModel.lastName}', userImage: userViewModel.profilePic, userId: userViewModel.uid);
+                                    });
                                     loadingViewModel.setLoading(false);
                                     showModalBottomSheet(
                                       context: context,

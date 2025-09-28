@@ -1,10 +1,14 @@
 import 'package:codex_clock/ViewModels/CorrectionRequestViewModel.dart';
+import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../Services/add_notification_service.dart';
+import '../../../Services/push_notification_service.dart';
 import '../../../Services/user_service.dart';
 import '../../../Utils/Utilities.dart';
 import '../../../ViewModels/Loading_ViewModel.dart';
+import '../../../ViewModels/admin_fcmtoken.dart';
 import '../../Widgets/BottomSheet.dart';
 import '../../Widgets/CustomButton.dart';
 import '../../Widgets/CustomDropdown.dart';
@@ -24,6 +28,8 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> {
   @override
   Widget build(BuildContext context) {
     final loadingViewModel = Provider.of<LoadingViewModel>(context, listen: true);
+    final adminTokenViewModel = Provider.of<AdminFcmTokenViewModel>(context, listen: true);
+    final userViewModel = Provider.of<UserDataViewModel>(context, listen: true);
     return Scaffold(
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
       body: SafeArea(
@@ -348,6 +354,9 @@ class _CorrectionRequestScreenState extends State<CorrectionRequestScreen> {
                              'period': viewModel.selectedCheckOutPeriod
                            },
                          ).then((_) {
+                           PushNotificationService().sendNotification(adminTokenViewModel.adminToken, 'Correction Request', 'Correction Request From ${userViewModel.firstName}').then((_) {
+                             AdminNotificationService().addNotification(title: 'Correction Request', description: 'Correction Request From ${userViewModel.firstName}', userName: '${userViewModel.firstName} ${userViewModel.lastName}', userImage: userViewModel.profilePic, userId: userViewModel.uid);
+                           });
                            loadingViewModel.setLoading(false);
                            showModalBottomSheet(
                              context: context,

@@ -45,7 +45,11 @@ class LeaveBottomSheet extends StatelessWidget {
             text: buttonText,
             color: const Color.fromRGBO(236, 0, 60, 1),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/home',
+                    (route) => false,
+              );
             },
           ),
         ],

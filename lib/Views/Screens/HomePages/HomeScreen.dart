@@ -6,6 +6,7 @@ import 'package:codex_clock/ViewModels/Home_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Navigation_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Summary_ViewModel.dart';
 import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
+import 'package:codex_clock/ViewModels/admin_fcmtoken.dart';
 import 'package:codex_clock/Views/Screens/AdditionalScreens/ProfileScreen.dart';
 import 'package:codex_clock/Views/Screens/HomePages/QR_CodeScreen.dart';
 import 'package:codex_clock/Views/Widgets/CustomDrawer.dart';
@@ -18,6 +19,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../Services/auth_service.dart';
 import '../../../Services/internet_connectivity.dart';
 import '../../../ViewModels/CompanyData_ViewModel.dart';
 
@@ -68,10 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final companyDataViewModel = Provider.of<CompanyDataViewModel>(context, listen: false);
     final summaryViewModel = Provider.of<SummaryViewModel>(context, listen: false);
     final homeViewmodel = Provider.of<HomeViewmodel>(context, listen: false);
+    final adminTokenViewmodel = Provider.of<AdminFcmTokenViewModel>(context, listen: false);
     fetchChartData(summaryViewModel, homeViewmodel);
     UserService().isConnectedToCompanyWiFi();
     fetchCompanyData(companyDataViewModel);
     updateTime();
+    fetchAdminToken(adminTokenViewmodel);
   }
 
   void fetchUserData(UserDataViewModel userDataViewModel) {
@@ -94,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
             userData["createdAt"],
             userData["status"]
         );
+        tokenUpdate(userDataViewModel.uid);
       }
     });
   }
@@ -126,6 +131,15 @@ class _HomeScreenState extends State<HomeScreen> {
       List<double> year = model.getMonthlyWorkedHoursTotalsForYear(DateTime.now().year);
       homeViewmodel.setFetchDataYear(year);
     });
+  }
+
+  void tokenUpdate(String uid) async {
+    await AuthService().updateToken(uid);
+  }
+
+  void fetchAdminToken(AdminFcmTokenViewModel viewModel) async {
+    String? token = await AuthService().getAdminFcmToken();
+    viewModel.setAdminToken(token!);
   }
 
   @override

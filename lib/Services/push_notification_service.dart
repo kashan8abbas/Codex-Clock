@@ -206,21 +206,21 @@ class PushNotificationService {
     }
   }
 
-  Future<void> sendNotification(String fcmToken, String type) async {
+  Future<void> sendNotification(String fcmToken, String title, String body) async {
     final get = get_server_key();
     await get.server_token().then((value) async {
       String serverKey =
           value;
 
 
-      final Uri url = Uri.parse('https://fcm.googleapis.com/v1/projects/bet-master-f40be/messages:send');
+      final Uri url = Uri.parse('https://fcm.googleapis.com/v1/projects/code-x-clock/messages:send');
 
       final message = {
         "message": {
           "token": fcmToken,
           "data": {
-            "title": 'New $type Request',
-            "body": 'A user has requested a $type'
+            "title": title,
+            "body": body
           }
         }
 

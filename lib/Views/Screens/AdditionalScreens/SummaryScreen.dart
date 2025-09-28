@@ -181,8 +181,8 @@ class SummaryScreen extends StatelessWidget {
                                       ? _calendarDayWidget(
                                     formattedDay,
                                     Colors.transparent,
-                                    Colors.black,// Red = Absent
-                                        () => _onDateSelected(context, day),
+                                    Colors.grey.shade700,// Red = Absent
+                                        () => {},
                                     )
                                       : _calendarDayWidget(
                                     formattedDay,

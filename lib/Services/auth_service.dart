@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:codex_clock/Utils/Utilities.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
@@ -148,6 +149,39 @@ class AuthService {
     } catch (e) {
       Utilities().errorMsg('Error uploading image, Please try again');
       return null;
+    }
+  }
+
+  Future<void> updateToken(String userId) async {
+    final FirebaseFirestore fireStore = FirebaseFirestore.instance;
+    String? token = await FirebaseMessaging.instance.getToken();
+
+    try {
+      await fireStore.collection('Users').doc(userId).update({
+        'fcmToken': token,
+      });
+      print('token updated');
+    } catch (e) {
+      print('Error updating timing ❌: $e');
+    }
+  }
+
+
+
+  /// Fetch the first admin's FCM token
+  Future<String?> getAdminFcmToken() async {
+    final CollectionReference adminCollection =
+    FirebaseFirestore.instance.collection('Admin');
+    try {
+      QuerySnapshot snapshot = await adminCollection.limit(1).get();
+
+      if (snapshot.docs.isNotEmpty) {
+        return snapshot.docs.first['fcmToken'] as String?;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch admin token: $e");
     }
   }
 
