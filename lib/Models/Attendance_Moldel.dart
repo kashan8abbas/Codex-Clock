@@ -1,5 +1,5 @@
 class AttendanceModel {
-  final String date; // e.g., "02 May"
+  final String date;
   final String checkIn;
   final String checkOut;
   final String hours;

@@ -23,10 +23,10 @@ class AttendanceViewModel extends ChangeNotifier {
   List<AttendanceModel> get data => _data;
   String get selectedLeaveType => _selectedLeaveType;
 
-  void setMonth(int index) {
+  void setMonth(int index, int workingTime) {
     _data = [];
     _selectedMonth = index;
-    fetchRecords(index+1);
+    fetchRecords(index+1, workingTime);
     notifyListeners();
   }
 
@@ -50,8 +50,8 @@ class AttendanceViewModel extends ChangeNotifier {
     }
   }
 
-  void fetchRecords(int month) async {
-    await UserService().fetchAttendanceForMonth(month: month).then((result) {
+  void fetchRecords(int month, int workingTime) async {
+    await UserService().fetchAttendanceForMonth(month: month, workingTime: workingTime).then((result) {
       _data = result;
       notifyListeners();
     });

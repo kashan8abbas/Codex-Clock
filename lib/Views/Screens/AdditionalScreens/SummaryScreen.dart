@@ -173,7 +173,7 @@ class SummaryScreen extends StatelessWidget {
                                   return model.attendanceRecords.containsKey(DateFormat('dd-MM-yyyy').format(day))
                                       ? _calendarDayWidget(
                                     formattedDay,
-                                    const Color.fromRGBO(0, 239, 64, 1),
+                                    Colors.green,
                                     Colors.white,// Green = Present
                                         () => _onDateSelected(context, day),
                                   )
@@ -184,7 +184,12 @@ class SummaryScreen extends StatelessWidget {
                                     Colors.grey.shade700,// Red = Absent
                                         () => {},
                                     )
-                                      : _calendarDayWidget(
+                                      : day.weekday == 6 || day.weekday == 7 ? _calendarDayWidget(
+                                    formattedDay,
+                                    Colors.transparent,
+                                    Colors.grey.shade700,// Red = Absent
+                                        () => {},
+                                  ) : _calendarDayWidget(
                                     formattedDay,
                                     const Color.fromRGBO(236, 0, 60, 1),
                                     Colors.white,// Red = Absent

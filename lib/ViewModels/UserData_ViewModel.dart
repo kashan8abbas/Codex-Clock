@@ -17,6 +17,7 @@ class UserDataViewModel with ChangeNotifier {
   String _profilePic = '';
   Timestamp _createdAt = Timestamp(0, 0);
   String _status = '';
+  List<dynamic> _salary = [];
 
   String get uid => _uid;
   String get cnic => _cnic;
@@ -33,6 +34,7 @@ class UserDataViewModel with ChangeNotifier {
   String get profilePic => _profilePic;
   String get status => _status;
   Timestamp get createdAt => _createdAt;
+  List<dynamic> get salary => _salary;
 
 
   void updateUserData(
@@ -69,6 +71,12 @@ class UserDataViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateSalary(String uid, List<dynamic> salary) {
+    _uid = uid;
+    _salary = salary;
+    notifyListeners();
+  }
+
 
 
   void clearData() {
@@ -87,6 +95,7 @@ class UserDataViewModel with ChangeNotifier {
     _profilePic = '';
     _createdAt = Timestamp(0, 0);
     _status = '';
+    _salary = [];
     notifyListeners();
   }
 }

@@ -45,7 +45,7 @@ class RandomAttendanceScreen extends StatelessWidget {
         .collection("Attendance")
         .doc(userId)
         .collection("records")
-        .doc('11-07-2025') // doc name = timestamp string
+        .doc('29-09-2025') // doc name = timestamp string
         .set({
       "checkIn": Timestamp.fromDate(checkIn),
       "checkOut": Timestamp.fromDate(checkOut),

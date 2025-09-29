@@ -1,8 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:codex_clock/ViewModels/Home_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Summary_ViewModel.dart';
+import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:network_info_plus/network_info_plus.dart';
+import 'package:provider/provider.dart';
 
 import '../Models/Attendance_Moldel.dart';
 
@@ -33,6 +37,91 @@ class UserService {
       throw Exception("Failed to fetch current user data");
     }
     return null;
+  }
+
+  Future<Map<String, int>> fetchMonthlyLeaveSummary(String userId, BuildContext context) async {
+    final viewModel = Provider.of<HomeViewmodel>(context, listen: false);
+    final userDataViewModel = Provider.of<UserDataViewModel>(context, listen: false);
+    final firestore = FirebaseFirestore.instance;
+    final now = DateTime.now();
+
+    int sickCount = 0;
+    int casualCount = 0;
+    int absentCount = 0;
+
+    final DateFormat docIdFormat = DateFormat('dd-MM-yyyy');
+
+    // ✅ Get Sick Leaves
+    final sickSnapshot = await firestore
+        .collection('Leave')
+        .doc(userId)
+        .collection('leaveRecords')
+        .where('leaveType', isEqualTo: 'Sick')
+        .where('status', isEqualTo: 'Approved')
+        .get();
+    sickCount = sickSnapshot.docs.length;
+
+    // ✅ Get Casual Leaves
+    final casualSnapshot = await firestore
+        .collection('Leave')
+        .doc(userId)
+        .collection('leaveRecords')
+        .where('leaveType', isEqualTo: 'Casual')
+        .where('status', isEqualTo: 'Approved')
+        .get();
+    casualCount = casualSnapshot.docs.length;
+
+    // ✅ Fetch all attendance records for this user
+    final attendanceSnapshot = await firestore
+        .collection('Attendance')
+        .doc(userId)
+        .collection('records')
+        .get();
+
+    // Convert snapshot docs into a Set of existing days
+    Set<String> existingDays = attendanceSnapshot.docs.map((doc) => doc.id).toSet();
+
+    // ✅ Loop through all days of current month
+    DateTime firstDay = DateTime(now.year, now.month, 1);
+    DateTime lastDay = DateTime(now.year, now.month + 1, 0);
+
+    for (int day = 0; day < lastDay.day; day++) {
+      DateTime currentDate = firstDay.add(Duration(days: day));
+
+      // Skip weekends
+      if (currentDate.weekday == DateTime.saturday ||
+          currentDate.weekday == DateTime.sunday) {
+        continue;
+      }
+
+      // Skip future dates
+      if (currentDate.isAfter(now)) {
+        continue;
+      }
+
+      // Skip days before user joined
+      if (currentDate.isBefore(userDataViewModel.createdAt.toDate())) {
+        continue;
+      }
+
+      String docId = docIdFormat.format(currentDate);
+
+      // If no record exists → Absent
+      if (!existingDays.contains(docId)) {
+        absentCount++;
+      }
+    }
+
+
+    viewModel.setLeaves(sickCount, casualCount, absentCount);
+    viewModel.setFirstLoad(false);
+
+    return {
+      "sick": sickCount,
+      "casual": casualCount,
+      "absent": absentCount,
+      "total": sickCount + casualCount + absentCount,
+    };
   }
 
   Future<String> isConnectedToCompanyWiFi() async {
@@ -191,6 +280,7 @@ class UserService {
 
   Future<List<AttendanceModel>> fetchAttendanceForMonth({
     required int month,
+    required int workingTime,
   }) async {
     final userId = FirebaseAuth.instance.currentUser!.uid;
     int year = DateTime.now().year;
@@ -203,8 +293,21 @@ class UserService {
     DateTime firstDay = DateTime(year, month, 1);
     DateTime lastDay = DateTime(year, month + 1, 0);
 
+    DateTime today = DateTime.now();
+
     for (int day = 0; day <= lastDay.day - 1; day++) {
       DateTime currentDate = firstDay.add(Duration(days: day));
+
+      // ❌ Skip if weekend (Saturday = 6, Sunday = 7)
+      if (currentDate.weekday == DateTime.saturday || currentDate.weekday == DateTime.sunday) {
+        continue;
+      }
+
+      // ❌ Skip if future date in current month
+      if (currentDate.isAfter(today)) {
+        continue;
+      }
+
       String docId = docIdFormat.format(currentDate);
       String displayDate = displayFormat.format(currentDate);
 
@@ -226,10 +329,13 @@ class UserService {
         int hours = duration.inHours;
         int minutes = duration.inMinutes.remainder(60);
 
-        String formattedHours = '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+        int total = (hours * 60) + minutes;
+
+        String formattedHours =
+            '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
 
         String status = 'Full Day';
-        if (hours < 8) {
+        if (total < workingTime) {
           status = 'Early Leave';
         }
 
@@ -257,6 +363,7 @@ class UserService {
 
     return monthlyData;
   }
+
 
 
 }

@@ -1,239 +1,166 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
-import '../../../ViewModels/Salary_ViewModel.dart';
+import '../../../Services/user_service.dart';
+import '../../../ViewModels/UserData_ViewModel.dart';
+import '../../../ViewModels/update_salary_viewmodel.dart';
 
 class SalaryScreen extends StatefulWidget {
-  const SalaryScreen({super.key});
+  const SalaryScreen({super.key,});
 
   @override
   State<SalaryScreen> createState() => _SalaryScreenState();
 }
-
 class _SalaryScreenState extends State<SalaryScreen> {
+
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
+    final userDataViewModel =
+    Provider.of<UserDataViewModel>(context, listen: true);
+
     return Scaffold(
       backgroundColor: const Color.fromRGBO(246, 245, 248, 1),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Consumer<SalaryViewModel>(builder: (context, model, child) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20, left: 5),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back_ios_new_sharp),
-                      ),
-                      const Spacer(),
-                      const Text(
-                        "Salary",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const Spacer(),
-                      const SizedBox(width: 60),
-                    ],
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: userDataViewModel.uid != ''
+            ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 50, left: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(Icons.arrow_back_ios),
                   ),
-                ),
-
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3), // soft shadow
-                        blurRadius: 10, // spread blur
-                        offset: const Offset(0, 4), // shadow position
-                      ),
-                    ],
+                  const Text('Salary Slip', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
+                  InkWell(
+                    onTap: () {
+                    },
+                    child: const Icon(Icons.arrow_back_ios, color: Colors.transparent,),
                   ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('The current net salary based on'),
-                              Text('Jan 2025', style: TextStyle(fontWeight: FontWeight.bold),),
-                            ],
-                          ),
-                          Icon(Icons.calendar_month),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text('RS: 15000 / ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
-                                Text('month', style: TextStyle(color: Colors.grey, ),),
-                              ],
-                            ),
-                            Text('Fifteen thousand per month', style: TextStyle(color: Colors.grey.shade600),),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 10,),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3), // soft shadow
-                        blurRadius: 10, // spread blur
-                        offset: const Offset(0, 4), // shadow position
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: _leaveTypeButton("Earning", model),
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: _leaveTypeButton("Deduction", model),
-                            ),
-                          ],
-                        ),
-                      ),
-                      model.selectedLeaveType == 'Earning'
-                      ? Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                        child: Column(
-                          children: [
-                            _salaryRow('Basic', '10,000', false),
-                            _salaryRow('Incentive Pay', '3,000', true),
-                            _salaryRow('House Rent Allowance', '1,000', false),
-                            _salaryRow('Overtime', '1,000', true),
-                            const SizedBox(height: 20,),
-                            Container(
-                              height: 1,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  color: Colors.grey.shade800 ,
-                                  borderRadius: BorderRadius.all(Radius.circular(5))
-                              ),
-                            ),
-                            const SizedBox(height: 10,),
-                            _salaryRow('Total', '15,000', false)
-
-                          ],
-                        ),
-                      )
-                      : Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                        child: Column(
-                          children: [
-                            _salaryRow('Late In', '1,000', false),
-                            _salaryRow('Leave', '1,500', true),
-                            _salaryRow('Loan', '1,000', false),
-                            const SizedBox(height: 20,),
-                            Container(
-                              height: 1,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  color: Colors.grey.shade800 ,
-                                  borderRadius: BorderRadius.all(Radius.circular(5))
-                              ),
-                            ),
-                            const SizedBox(height: 10,),
-                            _salaryRow('Total', '2,500', false)
-
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-
-
-                // Fixed Top Bar
-
-              ],
-            );
-          })
-        ),
-      ),
-    );
-  }
-
-  Widget _leaveTypeButton(String type, SalaryViewModel model) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => model.setLeaveType(type),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 13),
-          decoration: BoxDecoration(
-            color: model.selectedLeaveType == type ? const Color.fromRGBO(236, 0, 60, 1) : Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(8),
-            //border: Border.all(color: Colors.red),
-          ),
-          child: Center(
-            child: Text(
-              type,
-              style: TextStyle(
-                color:
-                model.selectedLeaveType == type
-                    ? Colors.white
-                    : Colors.black,
-                fontWeight: FontWeight.bold,
+                ],
               ),
             ),
+            const SizedBox(height: 20),
+            _totalSalaryCard(),
+            const SizedBox(height: 20),
+            _salaryCard(),
+          ],
+        )
+            : const SizedBox(
+          height: 700,
+          width: double.infinity,
+          child: Center(
+            child: SpinKitCircle(color: Colors.redAccent),
           ),
         ),
       ),
     );
   }
 
-  Widget _salaryRow(String first, String second, bool isFilled) {
-    return Container(
-      padding: EdgeInsets.all(5),
-      decoration: BoxDecoration(
-          color: isFilled ? Colors.grey.shade100 : Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(5))
+  Widget _totalSalaryCard() {
+    final updateSalaryViewModel = Provider.of<UpdateSalaryViewModel>(context, listen: true);
+
+    return Card(
+      color: Colors.white,
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'RS. ${updateSalaryViewModel.totalInDigits} / month',
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${updateSalaryViewModel.totalInWords} Rupees per month',
+              style: const TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _salaryCard() {
+    final updateSalaryViewModel = Provider.of<UpdateSalaryViewModel>(context, listen: true);
+    return Card(
+      color: Colors.white,
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Details',
+                    style:
+                    TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                for (int i = 0; i < updateSalaryViewModel.salaryDetails.length; i++)
+                  _salaryItem(
+                    updateSalaryViewModel.salaryDetails[i]["nameController"],
+                    updateSalaryViewModel.salaryDetails[i]["salaryController"],
+                  ),
+              ],
+            ),
+            const SizedBox(height: 10,),
+            const Divider(),
+            const SizedBox(height: 10,),
+            _salaryItem(TextEditingController(text: 'Total'), TextEditingController(text: updateSalaryViewModel.totalInDigits))
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _salaryItem(
+      TextEditingController nameController, TextEditingController salaryController) {
+    final updateSalaryViewModel = Provider.of<UpdateSalaryViewModel>(context, listen: true);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(first, style: TextStyle(fontSize: 16),),
-          Text(second, style: TextStyle(fontSize: 16),),
+          // Name field (smaller width, compact)
+          Text(nameController.text.trim()),
+          Text(salaryController.text.trim())
         ],
       ),
     );
   }
 
 }
+

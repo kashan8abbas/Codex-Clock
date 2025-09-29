@@ -1,5 +1,6 @@
 import 'package:codex_clock/Services/user_service.dart';
 import 'package:codex_clock/ViewModels/Attendence_ViewModel.dart';
+import 'package:codex_clock/ViewModels/CompanyData_ViewModel.dart';
 import 'package:codex_clock/Views/Widgets/AttendenceCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -21,7 +22,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   void initState() {
     super.initState();
     final attendanceViewmodel = Provider.of<AttendanceViewModel>(context, listen: false);
-    attendanceViewmodel.fetchRecords(DateTime.now().month);
+    final companyViewmodel = Provider.of<CompanyDataViewModel>(context, listen: false);
+    attendanceViewmodel.fetchRecords(DateTime.now().month, companyViewmodel.workingTime);
   }
 
 
@@ -170,6 +172,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       context: context,
       builder: (context) {
         final model = Provider.of<AttendanceViewModel>(context, listen: false);
+        final companyViewmodel = Provider.of<CompanyDataViewModel>(context, listen: false);
 
         final currentYear = DateTime.now().year;
         final currentMonth = DateTime.now().month;
@@ -195,7 +198,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 return ListTile(
                   title: Text('${model.months[index]} ${model.selectedYear}'),
                   onTap: () {
-                    model.setMonth(index);
+                    model.setMonth(index, companyViewmodel.workingTime);
                     Navigator.pop(context);
                   },
                 );
@@ -206,7 +209,5 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       },
     );
   }
-
-
 
 }

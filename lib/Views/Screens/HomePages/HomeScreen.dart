@@ -7,11 +7,13 @@ import 'package:codex_clock/ViewModels/Navigation_ViewModel.dart';
 import 'package:codex_clock/ViewModels/Summary_ViewModel.dart';
 import 'package:codex_clock/ViewModels/UserData_ViewModel.dart';
 import 'package:codex_clock/ViewModels/admin_fcmtoken.dart';
+import 'package:codex_clock/ViewModels/update_salary_viewmodel.dart';
 import 'package:codex_clock/Views/Screens/AdditionalScreens/ProfileScreen.dart';
 import 'package:codex_clock/Views/Screens/HomePages/QR_CodeScreen.dart';
 import 'package:codex_clock/Views/Widgets/CustomDrawer.dart';
 import 'package:codex_clock/Views/Widgets/CustomNavbar.dart';
 import 'package:codex_clock/Views/Widgets/CustomTimeCard.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,6 +24,7 @@ import 'package:provider/provider.dart';
 import '../../../Services/auth_service.dart';
 import '../../../Services/internet_connectivity.dart';
 import '../../../ViewModels/CompanyData_ViewModel.dart';
+import '../../Widgets/notification_icon.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -66,7 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     ConnectivityHelper.listenToConnectivityChanges(context);
     final userDataViewModel = Provider.of<UserDataViewModel>(context, listen: false);
-    fetchUserData(userDataViewModel);
+    final updateSalaryViewModel = Provider.of<UpdateSalaryViewModel>(context, listen: false);
+    fetchUserData(userDataViewModel, updateSalaryViewModel);
     final companyDataViewModel = Provider.of<CompanyDataViewModel>(context, listen: false);
     final summaryViewModel = Provider.of<SummaryViewModel>(context, listen: false);
     final homeViewmodel = Provider.of<HomeViewmodel>(context, listen: false);
@@ -78,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchAdminToken(adminTokenViewmodel);
   }
 
-  void fetchUserData(UserDataViewModel userDataViewModel) {
+  void fetchUserData(UserDataViewModel userDataViewModel, UpdateSalaryViewModel updateSalaryViewModel) {
     UserService().fetchCurrentUserData().then((userData) {
       if(userData != null) {
         userDataViewModel.updateUserData(
@@ -100,6 +104,39 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         tokenUpdate(userDataViewModel.uid);
       }
+      if (userData != null) {
+        userDataViewModel.updateSalary(
+          userData["Uid"],
+          userData['Salary'] ?? [],
+        );
+
+        List<Map<String, dynamic>> data = [];
+
+        if (userData.containsKey('Salary') && userData['Salary'] is List) {
+          data = (userData['Salary'] as List)
+              .map<Map<String, dynamic>>((item) {
+            if (item is Map<String, dynamic>) {
+              return {
+                "nameController": TextEditingController(text: item['name'] ?? ""),
+                "salaryController": TextEditingController(text: item['salary'] ?? ""),
+              };
+            } else if (item is List && item.length >= 2) {
+              return {
+                "nameController": TextEditingController(text: item[0].toString()),
+                "salaryController": TextEditingController(text: item[1].toString()),
+              };
+            } else {
+              return {
+                "nameController": TextEditingController(),
+                "salaryController": TextEditingController(),
+              };
+            }
+          }).toList();
+        }
+
+        updateSalaryViewModel.setList(data);
+        updateSalaryViewModel.getTotalInWord();
+      }
     });
   }
 
@@ -117,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     await appService.fetchCompanyTiming().then((companyTiming) {
       if(companyTiming != null) {
-        viewModel.setTimings(companyTiming['from'], companyTiming['to'], companyTiming['weeklyHours'], companyTiming['monthlyHours'], companyTiming['yearlyHours']);
+        viewModel.setTimings(companyTiming['from'], companyTiming['to'], companyTiming['weeklyHours'], companyTiming['monthlyHours'], companyTiming['yearlyHours'], companyTiming['workingTime']);
       }
     });
   }
@@ -188,20 +225,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 30),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
-                              },
-                              child: SizedBox(
-                                width: 60,
-                                height: 60,
-                                child: ClipOval(
-                                  child: SvgPicture.asset(
-                                    "lib/Utils/Images/Logo.svg",
-                                    width: 36,
-                                    height: 36,
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
+                                },
+                                child: SizedBox(
+                                  width: 60,
+                                  height: 60,
+                                  child: ClipOval(
+                                    child: SvgPicture.asset(
+                                      "lib/Utils/Images/Logo.svg",
+                                      width: 36,
+                                      height: 36,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -216,9 +256,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Color.fromARGB(255, 0, 0, 0),
                               ),
                             ),
- 
 
-                            Icon(Icons.notifications_active_outlined, size: 30,), // Keeps spacing balanced
+
+                            NotificationIcon()// Keeps spacing balanced
                           ],
                         ),
                       ),
@@ -237,6 +277,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildLeaveBalance() {
+    final viewModel = Provider.of<HomeViewmodel>(context, listen: true);
+    final userDataViewModel = Provider.of<UserDataViewModel>(context, listen: true);
     return Card(
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -264,19 +306,35 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio:
-                  1.95, // Adjust this value to control width & height ratio
-              children: const [
-                LeaveCard(title: "Sick Leave", value: "06", icon: Icons.group),
-                LeaveCard(title: "Absent", value: "02", icon: Icons.group),
-                LeaveCard(title: "Late in", value: "03", icon: Icons.group),
-                LeaveCard(title: "Total Leave", value: "08", icon: Icons.group),
-              ],
-            ),
+            FutureBuilder<Map<String, int>>(
+              future: UserService().fetchMonthlyLeaveSummary(userDataViewModel.uid, context),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  if(viewModel.isFirstLoad) {
+                    return SizedBox(
+                        height: 200,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 30),
+                          child: const SpinKitCircle(color: Color.fromRGBO(236, 0, 60, 1),size: 50),
+                        ));
+                  }
+                }
+
+                return GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 1.95,
+                  children: [
+                    LeaveCard(title: "Sick Leave", value: viewModel.sickLeaves.toString(), icon: Icons.local_hospital),
+                    LeaveCard(title: "Casual Leave", value: viewModel.casualLeaves.toString(), icon: Icons.work),
+                    LeaveCard(title: "Absent", value: viewModel.absents.toString(), icon: Icons.cancel),
+                    LeaveCard(title: "Total Leave", value: (viewModel.sickLeaves + viewModel.casualLeaves + viewModel.absents).toString(), icon: Icons.summarize),
+                  ],
+                );
+              },
+            )
+
           ],
         ),
       ),
@@ -709,7 +767,7 @@ class LeaveCard extends StatelessWidget {
                       ),
                       Icon(
                         Icons.chevron_right,
-                        color: Colors.black,
+                        color: Colors.transparent,
                         size: width * 0.103, // Adjust icon size based on width
                       ),
                     ],
